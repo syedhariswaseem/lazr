@@ -144,6 +144,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
+
 - **Stripe** for secure payment processing
 - **Next.js** for the amazing React framework
 - **Tailwind CSS** for the utility-first CSS framework
