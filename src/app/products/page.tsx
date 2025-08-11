@@ -8,7 +8,7 @@ import { useCart } from '@/contexts/CartContext';
 const products = [
   {
     id: 1,
-    name: "Precision Laser Cutter Pro 5000",
+    name: "Lazr Cutter Pro 5000",
     description: "High-power CO2 laser cutting system with 5000W output for industrial applications",
     price: 125000,
     category: "Industrial",
@@ -126,7 +126,7 @@ export default function ProductsPage() {
               Laser Cutting Machinery
             </h1>
             <p className="text-xl text-gray-200 max-w-2xl mx-auto">
-              Discover our range of precision laser cutting solutions for every industrial need.
+              Discover our range of Lazr cutting solutions for every industrial need.
             </p>
           </div>
         </div>

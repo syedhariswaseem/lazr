@@ -5,32 +5,29 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white">
-        <div className="absolute inset-0 bg-black opacity-50"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+      <section className="bg-black text-white py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Precision Laser
-              <span className="text-red-500"> Cutting</span>
+            <h1 className="text-5xl md:text-6xl font-bold mb-6">
+              Lazr
             </h1>
-            <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
-              Advanced laser cutting machinery for industrial applications. 
+            <p className="text-xl md:text-2xl text-gray-300 mb-8">
               Precision, efficiency, and reliability in every cut.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
+              <a
                 href="/products"
-                className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors duration-200 flex items-center justify-center"
+                className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors duration-200 inline-flex items-center justify-center"
               >
                 Explore Products
                 <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-              <Link
-                href="/contact"
-                className="border border-white text-white hover:bg-white hover:text-black px-8 py-3 rounded-lg font-semibold transition-colors duration-200"
+              </a>
+              <a
+                href="/about"
+                className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-black px-8 py-4 rounded-lg font-semibold transition-colors duration-200 inline-flex items-center justify-center"
               >
-                Get Quote
-              </Link>
+                Learn More
+              </a>
             </div>
           </div>
         </div>
@@ -40,20 +37,20 @@ export default function Home() {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Why Choose Our Laser Cutting Solutions?
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Why Choose Lazr?
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Cutting-edge technology meets industrial precision for your manufacturing needs.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="text-center p-6">
-              <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Zap className="h-8 w-8 text-white" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">High Power</h3>
+              <h3 className="text-2xl font-semibold text-gray-900 mb-4">High Performance</h3>
               <p className="text-gray-600">
                 Powerful laser systems for cutting through various materials with precision.
               </p>

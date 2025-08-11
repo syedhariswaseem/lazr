@@ -1,206 +1,163 @@
-# Precision Laser Cutting Machinery Application
+# Lazr - Industrial Laser Cutting Machinery Application
 
-A modern, sleek web application for a laser cutting machinery company built with Next.js, TypeScript, Tailwind CSS, and Prisma.
+A modern, full-stack e-commerce application built with **Next.js 15**, **TypeScript**, and **Stripe** for selling industrial laser cutting machinery. Features a complete shopping experience with dynamic cart management, secure payment processing, and beautiful UI/UX design.
 
-## Features
+## ✨ Key Features
 
-### 🏠 **Homepage**
-- Hero section with compelling call-to-action
-- Feature highlights showcasing laser cutting capabilities
-- Modern design with black and gray color scheme
-- Responsive layout for all devices
+### 🛒 **Shopping Experience**
+- **Dynamic Cart System** - Real-time cart management with localStorage persistence
+- **Product Catalog** - Filterable product listings with category navigation
+- **Product Details** - Comprehensive product pages with specifications, features, and related products
+- **Add to Cart** - Loading states, success toasts, and quantity indicators
 
-### 📦 **Products Page**
-- Grid layout displaying laser cutting machinery
-- Product categories and filtering
-- Product details with pricing and stock information
-- Add to cart functionality
-- Star ratings and product images
+### 💳 **Payment & Checkout**
+- **Stripe Integration** - Secure payment processing with Payment Element
+- **Checkout Flow** - Complete customer information collection and order processing
+- **Order Confirmation** - Beautiful success page with order details and next steps
+- **Webhook Handling** - Server-side payment event processing
 
-### 🛒 **Shopping Cart**
-- Interactive cart with quantity controls
-- Real-time price calculations
-- Remove items functionality
-- Order summary with tax calculations
-- Empty cart state with call-to-action
+### 🎨 **User Interface**
+- **Modern Design** - Clean, professional UI with Tailwind CSS
+- **Responsive Layout** - Mobile-first design that works on all devices
+- **Interactive Elements** - Hover effects, animations, and smooth transitions
+- **Toast Notifications** - Real-time feedback for user actions
 
-### 📄 **About Page**
-- Company story and mission
-- Team member profiles
-- Statistics and achievements
-- Company values and culture
+### 🔧 **Technical Stack**
+- **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS
+- **Backend**: Next.js API Routes, Prisma ORM
+- **Payment**: Stripe Checkout & Payment Element
+- **State Management**: React Context API with useReducer
+- **Database**: SQLite with Prisma (easily switchable to PostgreSQL/MySQL)
 
-### 📞 **Contact Page**
-- Contact form with validation
-- Company information and business hours
-- Interactive map placeholder
-- Multiple contact methods
-
-### 🔧 **Backend Features**
-- SQLite database with Prisma ORM
-- RESTful API endpoints
-- Product management
-- Cart functionality
-- User authentication ready
-
-## Tech Stack
-
-- **Frontend**: Next.js 15, React 19, TypeScript
-- **Styling**: Tailwind CSS
-- **Database**: SQLite with Prisma ORM
-- **Icons**: Lucide React
-- **Authentication**: JWT (ready for implementation)
-
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
-
 - Node.js 18+ 
 - npm or yarn
+- Stripe account
 
 ### Installation
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/lazr-app.git
+cd lazr-app
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd laser-cutting-app
-   ```
+# Install dependencies
+npm install
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+# Set up environment variables
+cp .env.example .env.local
+# Add your Stripe keys to .env.local
 
-3. **Set up environment variables**
-   ```bash
-   cp .env.example .env
-   ```
-   Update the `.env` file with your configuration:
-   ```
-   DATABASE_URL="file:./dev.db"
-   JWT_SECRET="your-super-secret-jwt-key-change-this-in-production"
-   ```
-
-4. **Set up the database**
-   ```bash
-   npx prisma generate
-   npx prisma db push
-   ```
-
-5. **Seed the database with sample data**
-   ```bash
-   npm run seed
-   ```
-
-6. **Start the development server**
-   ```bash
-   npm run dev
-   ```
-
-7. **Open your browser**
-   Navigate to [http://localhost:3000](http://localhost:3000)
-
-## Project Structure
-
-```
-laser-cutting-app/
-├── src/
-│   ├── app/
-│   │   ├── api/           # API routes
-│   │   ├── about/         # About page
-│   │   ├── cart/          # Cart page
-│   │   ├── contact/       # Contact page
-│   │   ├── products/      # Products page
-│   │   ├── globals.css    # Global styles
-│   │   ├── layout.tsx     # Root layout
-│   │   └── page.tsx       # Homepage
-│   ├── components/        # Reusable components
-│   └── lib/              # Utility functions
-├── prisma/
-│   ├── schema.prisma      # Database schema
-│   └── seed.ts           # Database seeder
-├── public/               # Static assets
-└── package.json
+# Run the development server
+npm run dev
 ```
 
-## Database Schema
+### Environment Variables
+```env
+STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key
+STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
+```
 
-The application uses the following database models:
+## 📱 Features Overview
 
-- **User**: User accounts and authentication
-- **Product**: Laser cutting machinery products
-- **CartItem**: Shopping cart items
-- **Order**: Customer orders
-- **OrderItem**: Individual items in orders
+### **Product Management**
+- Product catalog with filtering
+- Detailed product pages with specifications
+- Related products suggestions
+- Stock management and availability
 
-## API Endpoints
+### **Shopping Cart**
+- Add/remove items with quantity controls
+- Real-time cart updates
+- Persistent cart state
+- Cart count in navigation
 
-### Products
-- `GET /api/products` - Get all products
-- `POST /api/products` - Create new product
+### **Checkout Process**
+- Customer information collection
+- Secure Stripe payment processing
+- Order confirmation and tracking
+- Email notifications (webhook ready)
 
-### Cart
-- `GET /api/cart?userId=<id>` - Get user's cart
-- `POST /api/cart` - Add item to cart
-- `PUT /api/cart` - Update cart item quantity
-- `DELETE /api/cart?id=<id>` - Remove item from cart
+### **User Experience**
+- Loading states and error handling
+- Toast notifications for feedback
+- Responsive design for all devices
+- Smooth animations and transitions
 
-## Available Scripts
+## 🏗️ Architecture
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
-- `npm run seed` - Seed database with sample data
+### **Frontend Structure**
+```
+src/
+├── app/                    # Next.js 15 app router
+│   ├── products/          # Product catalog & details
+│   ├── cart/              # Shopping cart
+│   ├── checkout/          # Checkout flow
+│   └── api/               # API routes
+├── components/            # Reusable UI components
+├── contexts/              # React context providers
+└── lib/                   # Utility functions
+```
 
-## Design Features
+### **Key Components**
+- **CartContext** - Global cart state management
+- **Toast System** - Notification system
+- **Stripe Integration** - Payment processing
+- **Product Components** - Catalog and detail views
 
-### Color Scheme
-- **Primary**: Black (#000000)
-- **Secondary**: Gray shades (#1f2937, #374151, #6b7280)
-- **Accent**: Red (#dc2626) for call-to-actions
-- **Background**: Light gray (#f9fafb)
+## 🎯 Business Value
 
-### Typography
-- **Font**: Inter (Google Fonts)
-- **Weights**: Regular, Medium, Semibold, Bold
+This application demonstrates a complete e-commerce solution suitable for:
+- **Industrial Equipment Sales** - High-value machinery with complex specifications
+- **B2B E-commerce** - Professional interface for business customers
+- **Custom Product Catalogs** - Easily adaptable for different industries
+- **Secure Payment Processing** - Enterprise-grade payment security
 
-### Components
-- Responsive navigation with mobile menu
-- Modern card layouts
-- Interactive buttons and forms
-- Loading states and animations
+## 🔒 Security Features
 
-## Future Enhancements
+- **Stripe Security** - PCI-compliant payment processing
+- **Webhook Verification** - Secure server-side event handling
+- **Input Validation** - Form validation and sanitization
+- **Environment Variables** - Secure configuration management
 
-- [ ] User authentication and registration
-- [ ] Admin dashboard for product management
-- [ ] Payment integration (Stripe)
-- [ ] Order tracking system
-- [ ] Customer reviews and ratings
-- [ ] Advanced product filtering
-- [ ] Wishlist functionality
-- [ ] Email notifications
-- [ ] Multi-language support
+## 🚀 Deployment Ready
 
-## Contributing
+The application is production-ready with:
+- **Vercel Deployment** - Optimized for Next.js
+- **Database Integration** - Prisma ORM with multiple database support
+- **Environment Configuration** - Easy deployment setup
+- **Performance Optimization** - Next.js 15 optimizations
+
+## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## License
+## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Support
+## 🙏 Acknowledgments
 
-For support and questions, please contact:
-- Email: shharis81@gmail.com
-- Phone: +92 320 4577866
+
+- **Stripe** for secure payment processing
+- **Next.js** for the amazing React framework
+- **Tailwind CSS** for the utility-first CSS framework
+- **Lucide React** for beautiful icons
 
 ---
 
-Built with ❤️ using Next.js and modern web technologies.
+**Ready to revolutionize industrial equipment sales?** 🚀
+
+This project showcases modern e-commerce development with enterprise-grade features, perfect for selling high-value industrial machinery with a professional, secure, and user-friendly experience.
+
+## 📞 Contact
+
+- **Website**: [lazr.com](https://lazr.com)
+- **Email**: info@lazr.com
+- **Sales**: sales@lazr.com

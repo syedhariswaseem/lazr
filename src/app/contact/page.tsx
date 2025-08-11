@@ -191,8 +191,8 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-1">Email</h3>
-                    <p className="text-gray-600">info@precisionlaser.com</p>
-                    <p className="text-gray-600">sales@precisionlaser.com</p>
+                    <p className="text-gray-700">info@lazr.com</p>
+                    <p className="text-gray-700">sales@lazr.com</p>
                   </div>
                 </div>
 

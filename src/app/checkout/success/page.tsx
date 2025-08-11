@@ -41,7 +41,7 @@ export default function CheckoutSuccessPage() {
         email: 'john@example.com', // In real app, get from customer info
         total: 303000,
         items: [
-          { name: 'Precision Laser Cutter Pro 5000', quantity: 1, price: 125000 },
+          { name: 'Lazr Cutter Pro 5000', quantity: 1, price: 125000 },
           { name: 'Fiber Laser Cutter Elite 3000', quantity: 2, price: 89000 },
         ],
         estimatedDelivery: estimatedDelivery.toLocaleDateString('en-US', {
