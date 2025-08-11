@@ -9,9 +9,9 @@ import { useCart } from '@/contexts/CartContext';
 const products = [
   {
     id: 1,
-    name: "Precision Laser Cutter Pro 5000",
+    name: "Lazr Cutter Pro 5000",
     description: "High-power CO2 laser cutting system with 5000W output for industrial applications. This advanced laser cutting machine delivers exceptional precision and speed for cutting various materials including steel, aluminum, and other metals.",
-    longDescription: "The Precision Laser Cutter Pro 5000 is our flagship industrial laser cutting system designed for high-volume production environments. With its advanced fiber laser technology, this machine can cut through materials up to 25mm thick with exceptional precision and minimal heat-affected zones. The integrated automation features include automatic material handling, real-time monitoring, and predictive maintenance capabilities.",
+    longDescription: "The Lazr Cutter Pro 5000 is our flagship industrial laser cutting system designed for high-volume production environments. With its advanced fiber laser technology, this machine can cut through materials up to 25mm thick with exceptional precision and minimal heat-affected zones. The integrated automation features include automatic material handling, real-time monitoring, and predictive maintenance capabilities.",
     price: 125000,
     category: "Industrial",
     imageUrl: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=500&h=300&fit=crop",

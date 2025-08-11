@@ -26,7 +26,7 @@ const Navbar = () => {
               <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
                 <div className="w-4 h-4 bg-white rounded-full"></div>
               </div>
-              <span className="text-xl font-bold">Precision Laser</span>
+              <span className="text-xl font-bold">Lazr</span>
             </Link>
           </div>
 

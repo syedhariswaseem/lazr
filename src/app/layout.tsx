@@ -8,7 +8,7 @@ import { ToastContainer } from "@/components/Toast";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Precision Laser Cutting Machinery",
+  title: "Lazr - Industrial Laser Cutting Machinery",
   description: "Professional laser cutting solutions for industrial applications",
 };
 

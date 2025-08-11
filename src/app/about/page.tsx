@@ -3,98 +3,87 @@ import { Award, Users, Target, Globe } from 'lucide-react';
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <section className="bg-black text-white py-20">
+      {/* Header */}
+      <section className="bg-black text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              About Precision Laser
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              About Lazr
             </h1>
-            <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto">
-              Leading the future of industrial laser cutting technology with innovation, 
-              precision, and unwavering commitment to quality.
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              Leading the industry with innovation, precision, and unwavering commitment to quality.
             </p>
           </div>
         </div>
       </section>
 
       {/* Company Story */}
-      <section className="py-20 bg-white">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-                Our Story
-              </h2>
-              <p className="text-lg text-gray-600 mb-6">
-                Founded in 2010, Precision Laser has been at the forefront of laser cutting 
-                technology innovation. What started as a small workshop has grown into a 
-                global leader in industrial laser cutting solutions.
+              <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Story</h2>
+              <p className="text-lg text-gray-700 mb-6">
+                Founded in 2010, Lazr has been at the forefront of laser cutting
+                technology, serving industries worldwide with cutting-edge solutions.
               </p>
-              <p className="text-lg text-gray-600 mb-6">
-                Our journey began with a simple mission: to make precision laser cutting 
-                accessible to manufacturers of all sizes. Today, we serve clients across 
-                industries worldwide, from automotive to aerospace, from small workshops 
-                to large-scale production facilities.
+              <p className="text-lg text-gray-700 mb-6">
+                Our journey began with a simple mission: to make precision laser cutting
+                technology accessible to manufacturers of all sizes. Today, we're proud
+                to be a trusted partner for thousands of businesses across the globe.
               </p>
-              <p className="text-lg text-gray-600">
-                With over 13 years of experience and thousands of successful installations, 
-                we continue to push the boundaries of what's possible in laser cutting technology.
+              <p className="text-lg text-gray-700">
+                With over a decade of experience and continuous innovation, we've
+                established ourselves as the go-to provider for industrial laser
+                cutting machinery that delivers exceptional results.
               </p>
             </div>
-            <div className="bg-gray-200 h-96 rounded-lg flex items-center justify-center">
-              <div className="text-center text-gray-500">
-                <Globe className="h-16 w-16 mx-auto mb-4" />
-                <p>Company Image</p>
-              </div>
+            <div className="bg-gray-200 rounded-lg h-96 flex items-center justify-center">
+              <span className="text-gray-500 text-lg">Company Image</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Mission & Values */}
-      <section className="py-20 bg-gray-900 text-white">
+      {/* Values */}
+      <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Our Mission & Values
-            </h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Driving innovation in laser cutting technology while maintaining the highest 
-              standards of quality and customer service.
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Values</h2>
+            <p className="text-xl text-gray-600">
+              The principles that guide everything we do
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center p-6">
-              <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Target className="h-8 w-8 text-white" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Precision</h3>
-              <p className="text-gray-300">
-                Every cut, every measurement, every detail matters. We deliver 
-                precision that exceeds industry standards.
+              <p className="text-gray-600">
+                We deliver laser cutting solutions with unmatched precision that exceeds industry standards.
               </p>
             </div>
 
-            <div className="text-center p-6">
-              <div className="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Award className="h-8 w-8 text-white" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Quality</h3>
-              <p className="text-gray-300">
-                Our commitment to quality is unwavering. Every product we manufacture 
+              <p className="text-gray-600">
+                Our commitment to quality is unwavering. Every product we manufacture
                 meets the highest standards of excellence.
               </p>
             </div>
 
-            <div className="text-center p-6">
-              <div className="w-16 h-16 bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Users className="h-8 w-8 text-white" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Innovation</h3>
-              <p className="text-gray-300">
-                We continuously push the boundaries of laser cutting technology, 
+              <p className="text-gray-600">
+                We continuously push the boundaries of laser cutting technology,
                 developing solutions for tomorrow's challenges.
               </p>
             </div>
