@@ -198,8 +198,8 @@ This project is licensed under the MIT License.
 ## Support
 
 For support and questions, please contact:
-- Email: info@precisionlaser.com
-- Phone: +1 (555) 123-4567
+- Email: shharis81@gmail.com
+- Phone: +92 320 4577866
 
 ---
 
