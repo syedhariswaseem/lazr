@@ -134,7 +134,7 @@ export default function HomePage() {
                 className="group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
               >
                 <span className="relative z-10 flex items-center">
-                  Explore Products
+                Explore Products
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
                 </span>
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -198,8 +198,8 @@ export default function HomePage() {
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
               Discover our range of cutting-edge laser cutting solutions for every industrial need.
-            </p>
-          </div>
+              </p>
+            </div>
 
           <div className="grid md:grid-cols-3 gap-8 mb-12">
             {products.map((product) => (
@@ -305,7 +305,7 @@ export default function HomePage() {
             <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
               Don't just take our word for it. Here's what industry leaders have to say about Lazr.
             </p>
-          </div>
+            </div>
 
           <div className="relative max-w-4xl mx-auto">
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 md:p-12 shadow-2xl">
@@ -355,8 +355,8 @@ export default function HomePage() {
             Get started today and experience the future of precision manufacturing.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/contact"
+          <Link
+            href="/contact"
               className="px-8 py-4 bg-white text-blue-600 rounded-full font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
             >
               Get Quote
@@ -366,7 +366,7 @@ export default function HomePage() {
               className="px-8 py-4 border-2 border-white text-white rounded-full font-semibold text-lg hover:bg-white hover:text-blue-600 transition-all duration-300"
             >
               Browse Products
-            </Link>
+          </Link>
           </div>
         </div>
       </section>
