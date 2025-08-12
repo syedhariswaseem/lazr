@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { CheckCircle, Download, Mail, Phone, Home, Truck, Clock, Shield, Star } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
+import { useCheckout } from '@/contexts/CheckoutContext';
 
 interface OrderDetails {
   orderId: string;
@@ -15,65 +16,123 @@ interface OrderDetails {
     quantity: number;
     price: number;
   }>;
-  estimatedDelivery: string;
-  trackingNumber: string;
+  createdAt: string;
 }
 
 export default function CheckoutSuccessPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { clearCart } = useCart();
+  const { state: checkoutState, clearCheckoutData } = useCheckout();
   const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const fetchedRef = useRef(false);
 
-  useEffect(() => {
-    const sessionId = searchParams.get('session_id');
-    const paymentIntentId = searchParams.get('payment_intent_id');
-
-    if (sessionId || paymentIntentId) {
-      // Generate order details based on the payment
-      const orderId = `ORD-${Date.now().toString().slice(-8)}`;
-      const estimatedDelivery = new Date();
-      estimatedDelivery.setDate(estimatedDelivery.getDate() + 7); // 7 days from now
-      
-      setOrderDetails({
-        orderId,
-        customerName: 'John Doe', // Replace with real customer info
-        email: 'john@example.com', // Replace with real customer info
-        total: 303000,
-        items: [
-          { name: 'Lazr Cutter Pro 5000', quantity: 1, price: 125000 },
-          { name: 'Fiber Laser Cutter Elite 3000', quantity: 2, price: 89000 },
-        ],
-        estimatedDelivery: estimatedDelivery.toLocaleDateString('en-US', {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        }),
-        trackingNumber: `TRK-${Math.random().toString(36).substr(2, 8).toUpperCase()}`
-      });
-
-      // Clear the cart after successful order
-      clearCart();
+    useEffect(() => {
+    if (fetchedRef.current) return; // prevent double-fetch in dev
+    
+    // Wait for CheckoutContext to finish loading from localStorage
+    if (checkoutState.isLoading) {
+      console.log('⏳ Waiting for CheckoutContext to finish loading...');
+      return;
     }
-  }, [searchParams, clearCart]);
+    
+    fetchedRef.current = true;
 
-  if (!orderDetails) {
+    console.log('Success page loaded, checkout state:', checkoutState);
+    console.log('localStorage checkout data:', localStorage.getItem('checkoutData'));
+
+    // Check if we have checkout data in context
+    if (checkoutState.customerInfo && checkoutState.orderTotal && checkoutState.orderItems) {
+      console.log('✅ Using checkout data from context:', checkoutState);
+      
+      const orderDetails: OrderDetails = {
+        orderId: checkoutState.orderId || `ORD-${Date.now().toString().slice(-8).toUpperCase()}`,
+        customerName: `${checkoutState.customerInfo.firstName} ${checkoutState.customerInfo.lastName}`,
+        email: checkoutState.customerInfo.email,
+        total: checkoutState.orderTotal,
+        items: checkoutState.orderItems,
+        createdAt: new Date().toISOString(),
+      };
+      
+      console.log('Created order details from context:', orderDetails);
+      setOrderDetails(orderDetails);
+      clearCart();
+      return;
+    }
+
+    // Fallback: Create order details from cart data
+    console.log('⚠️ No checkout context data, using cart fallback');
+    const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
+    const total = cartItems.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
+    
+    const fallbackOrderDetails: OrderDetails = {
+      orderId: `ORD-${Date.now().toString().slice(-8).toUpperCase()}`,
+      customerName: 'Customer',
+      email: 'customer@example.com',
+      total,
+      items: cartItems.map((item: any) => ({
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price
+      })),
+      createdAt: new Date().toISOString(),
+    };
+    
+    console.log('Created fallback order details:', fallbackOrderDetails);
+    setOrderDetails(fallbackOrderDetails);
+    clearCart();
+  }, [checkoutState, clearCart]);
+
+  // Clear checkout data only when user navigates away from success page
+  useEffect(() => {
+    console.log('🔄 Setting up checkout data cleanup...');
+    
+    const handleBeforeUnload = () => {
+      console.log('🧹 Clearing checkout data on page unload');
+      clearCheckoutData();
+    };
+
+    // Clear data when user leaves the page
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      console.log('🧹 Cleaning up event listeners');
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [clearCheckoutData]);
+
+  if (!orderDetails || checkoutState.isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-gray-700 dark:text-gray-300">Loading your order details...</p>
+          <p className="text-gray-700 dark:text-gray-300">
+            {checkoutState.isLoading ? 'Loading checkout data...' : 'Loading your order details...'}
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 pt-20">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Success Header */}
       <section className="relative overflow-hidden py-16 bg-gradient-to-r from-green-600 to-blue-600">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Back to Home Button */}
+          <div className="absolute top-4 sm:top-8 left-4 sm:left-8 z-10">
+            <button
+              onClick={() => router.push('/')}
+              className="flex items-center space-x-1 sm:space-x-2 text-white hover:text-green-100 transition-colors duration-200 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-lg px-3 py-2 sm:px-4 sm:py-2"
+              aria-label="Back to Home"
+            >
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              <span className="text-sm sm:text-lg font-medium whitespace-nowrap">Back to Home</span>
+            </button>
+          </div>
+
           <div className="text-center">
             <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl">
               <CheckCircle className="h-12 w-12 text-green-600" />
@@ -108,18 +167,24 @@ export default function CheckoutSuccessPage() {
                 </div>
 
                 <div className="space-y-4 mb-6">
-                  {orderDetails.items.map((item, index) => (
-                    <div key={index} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900 dark:text-white">{item.name}</h4>
-                        <p className="text-sm text-gray-700 dark:text-gray-300">Quantity: {item.quantity}</p>
+                  {orderDetails.items.length > 0 ? (
+                    orderDetails.items.map((item, index) => (
+                      <div key={index} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-gray-900 dark:text-white">{item.name}</h4>
+                          <p className="text-sm text-gray-700 dark:text-gray-300">Quantity: {item.quantity}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-semibold text-gray-900 dark:text-white">${(item.price * item.quantity).toLocaleString()}</p>
+                          <p className="text-sm text-gray-700 dark:text-gray-300">${item.price.toLocaleString()} each</p>
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <p className="font-semibold text-gray-900 dark:text-white">${(item.price * item.quantity).toLocaleString()}</p>
-                        <p className="text-sm text-gray-700 dark:text-gray-300">${item.price.toLocaleString()} each</p>
-                      </div>
+                    ))
+                  ) : (
+                    <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-gray-700 dark:text-gray-300">
+                      Itemized details not available.
                     </div>
-                  ))}
+                  )}
                 </div>
 
                 <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
@@ -130,27 +195,21 @@ export default function CheckoutSuccessPage() {
                 </div>
               </div>
 
-              {/* Delivery Information */}
+              {/* Customer Information */}
               <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Delivery Information</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Customer Information</h2>
                 <div className="grid md:grid-cols-2 gap-6">
-                  <div className="flex items-start space-x-4">
-                    <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/40 rounded-full flex items-center justify-center flex-shrink-0">
-                      <Truck className="h-6 w-6 text-blue-600" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white">Estimated Delivery</h3>
-                      <p className="text-gray-700 dark:text-gray-300">{orderDetails.estimatedDelivery}</p>
-                    </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-white">Name</h3>
+                    <p className="text-gray-700 dark:text-gray-300">{orderDetails.customerName}</p>
                   </div>
-                  <div className="flex items-start space-x-4">
-                    <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/40 rounded-full flex items-center justify-center flex-shrink-0">
-                      <Clock className="h-6 w-6 text-purple-600" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white">Processing Time</h3>
-                      <p className="text-gray-700 dark:text-gray-300">1-2 business days</p>
-                    </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-white">Email</h3>
+                    <p className="text-gray-700 dark:text-gray-300">{orderDetails.email}</p>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-white">Order Date</h3>
+                    <p className="text-gray-700 dark:text-gray-300">{new Date(orderDetails.createdAt).toLocaleString()}</p>
                   </div>
                 </div>
               </div>
@@ -159,42 +218,39 @@ export default function CheckoutSuccessPage() {
               <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-xl p-8 text-white">
                 <h2 className="text-2xl font-bold mb-6">What Happens Next?</h2>
                 <div className="space-y-6">
-                  {["Order Confirmation","Processing & Quality Check","Shipping & Installation"].map((title, idx) => (
-                    <div key={title} className="flex items-start space-x-4">
-                      <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                        <span className="text-white font-semibold text-sm">{idx+1}</span>
-                      </div>
-                      <div>
-                        <h3 className="font-semibold">{title}</h3>
-                        <p className="text-blue-100">{idx===0 ? "You'll receive an email confirmation with all order details within the next few minutes." : idx===1 ? "Our team will inspect and prepare your equipment for shipment within 24 hours." : "We'll contact you to schedule delivery and professional installation at your facility."}</p>
-                      </div>
+                  <div className="flex items-start space-x-4">
+                    <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                      <span className="text-white font-semibold text-sm">1</span>
                     </div>
-                  ))}
+                    <div>
+                      <h3 className="font-semibold">Order Confirmation</h3>
+                      <p className="text-blue-100">You'll receive an email confirmation with all order details.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-4">
+                    <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                      <span className="text-white font-semibold text-sm">2</span>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold">Processing</h3>
+                      <p className="text-blue-100">We will prepare your equipment for shipment.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-4">
+                    <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                      <span className="text-white font-semibold text-sm">3</span>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold">Shipping</h3>
+                      <p className="text-blue-100">We'll contact you to arrange delivery and installation.</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Sidebar */}
             <div className="space-y-6">
-              {/* Customer Info */}
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Customer Information</h3>
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Name</p>
-                    <p className="font-semibold text-gray-900 dark:text-white">{orderDetails.customerName}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Email</p>
-                    <p className="font-semibold text-gray-900 dark:text-white">{orderDetails.email}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Order Date</p>
-                    <p className="font-semibold text-gray-900 dark:text-white">{new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                  </div>
-                </div>
-              </div>
-
               {/* Support */}
               <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Need Help?</h3>
@@ -203,14 +259,14 @@ export default function CheckoutSuccessPage() {
                     <Mail className="h-5 w-5 text-gray-600 dark:text-gray-300" />
                     <div>
                       <p className="font-medium text-gray-900 dark:text-white">Email Support</p>
-                      <p className="text-sm text-gray-700 dark:text-gray-300">support@lasercutting.com</p>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">shharis81@gmail.com</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-3">
                     <Phone className="h-5 w-5 text-gray-600 dark:text-gray-300" />
                     <div>
                       <p className="font-medium text-gray-900 dark:text-white">Phone Support</p>
-                      <p className="text-sm text-gray-700 dark:text-gray-300">1-800-LASER-123</p>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">+92 320 4577888</p>
                     </div>
                   </div>
                 </div>
@@ -237,19 +293,11 @@ export default function CheckoutSuccessPage() {
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={() => router.push('/')}
-              className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-            >
-              <Home className="h-5 w-5 mr-2" />
-              Return to Home
-            </button>
-            
+          {/* Download Receipt Button */}
+          <div className="mt-16 flex justify-center">
             <button
               onClick={() => window.print()}
-              className="bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-800 hover:to-gray-900 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+              className="bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 text-gray-700 dark:text-gray-300 px-8 py-4 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:-translate-y-1 hover:scale-105"
             >
               <Download className="h-5 w-5 mr-2" />
               Download Receipt

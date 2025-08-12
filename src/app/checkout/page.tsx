@@ -6,7 +6,9 @@ import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, CreditCard, Lock, Truck, Shield, XCircle, ShoppingCart } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
+import { useCheckout } from '@/contexts/CheckoutContext';
 import { useTheme } from '@/contexts/ThemeContext';
+import countries from 'world-countries';
 
 // Initialize Stripe
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
@@ -21,7 +23,215 @@ interface CustomerInfo {
   city: string;
   state: string;
   zipCode: string;
-  country: string;
+  country: string; // ISO alpha-2 code, e.g., 'US', 'GB'
+}
+
+interface ValidationErrors {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  country?: string;
+  stripe?: string;
+}
+
+// Payment Form Component that handles Stripe payment within Elements context
+function PaymentForm({ 
+  clientSecret, 
+  customerInfo, 
+  onSuccess, 
+  onError, 
+  isProcessing, 
+  setIsProcessing,
+  validationErrors,
+  setValidationErrors,
+  stripeElementComplete,
+  setStripeElementComplete,
+  calculateTotal,
+  validateForm,
+  scrollToField,
+  setCheckoutData,
+  setOrderId,
+  cartItems
+}: {
+  clientSecret: string;
+  customerInfo: CustomerInfo;
+  onSuccess: (paymentIntentId: string) => void;
+  onError: (message: string) => void;
+  isProcessing: boolean;
+  setIsProcessing: (processing: boolean) => void;
+  validationErrors: ValidationErrors;
+  setValidationErrors: (errors: ValidationErrors) => void;
+  stripeElementComplete: boolean;
+  setStripeElementComplete: (complete: boolean) => void;
+  calculateTotal: () => number;
+  validateForm: () => boolean;
+  scrollToField: (fieldName: string) => void;
+  setCheckoutData: (customerInfo: CustomerInfo, orderTotal: number, orderItems: Array<{ name: string; quantity: number; price: number }>) => void;
+  setOrderId: (orderId: string) => void;
+  cartItems: Array<{ id: number; name: string; quantity: number; price: number; imageUrl: string }>;
+}) {
+  const stripe = useStripe();
+  const elements = useElements();
+
+  const handlePlaceOrder = async () => {
+    // Clear previous errors
+    setValidationErrors({});
+    
+    // Validate form fields first
+    if (!validateForm()) {
+      // Find first error and scroll to it
+      const firstErrorField = Object.keys(validationErrors)[0];
+      if (firstErrorField) {
+        scrollToField(firstErrorField);
+      }
+      return;
+    }
+
+    // Check if Stripe element is complete
+    if (!stripeElementComplete) {
+      setValidationErrors(prev => ({ ...prev, stripe: 'Please complete your payment details' }));
+      return;
+    }
+
+    if (!stripe || !elements) {
+      onError('Stripe not initialized');
+      return;
+    }
+
+    // Store checkout data BEFORE payment processing
+    console.log('💾 Storing checkout data before payment...');
+    setCheckoutData(customerInfo, calculateTotal(), cartItems.map(item => ({
+      name: item.name,
+      quantity: item.quantity,
+      price: item.price
+    })));
+    
+    // Set a temporary order ID
+    setOrderId(`temp_${Date.now()}`);
+
+    setIsProcessing(true);
+
+    try {
+      // Submit the elements first (required by Stripe)
+      const { error: submitError } = await elements.submit();
+      if (submitError) {
+        onError(submitError.message || 'Payment validation failed');
+        setIsProcessing(false);
+        return;
+      }
+
+      const result = await stripe.confirmPayment({
+        elements,
+        clientSecret,
+        confirmParams: {
+          return_url: `${window.location.origin}/checkout/success`,
+          receipt_email: customerInfo.email || undefined,
+          payment_method_data: {
+            billing_details: {
+              name: `${customerInfo.firstName} ${customerInfo.lastName}`.trim() || undefined,
+              email: customerInfo.email || undefined,
+              phone: customerInfo.phone || undefined,
+              address: {
+                line1: customerInfo.address || undefined,
+                city: customerInfo.city || undefined,
+                state: customerInfo.state || undefined,
+                postal_code: customerInfo.zipCode || undefined,
+                country: customerInfo.country || undefined,
+              },
+            },
+          },
+        },
+      });
+
+      if (result.error) {
+        console.error('❌ Stripe payment error:', result.error);
+        onError(result.error.message || 'Payment failed');
+        setIsProcessing(false);
+        return;
+      }
+
+      if (result.paymentIntent) {
+        const paymentIntent = result.paymentIntent;
+        
+        if (paymentIntent.status === 'succeeded') {
+          onSuccess(paymentIntent.id);
+          return;
+        }
+
+        if (paymentIntent.status === 'processing') {
+          onError('Payment is processing. You will receive an email confirmation shortly.');
+          setIsProcessing(false);
+          return;
+        }
+      }
+
+      onError('Payment could not be completed.');
+      setIsProcessing(false);
+    } catch (error) {
+      onError(error instanceof Error ? error.message : 'Failed to process order');
+      setIsProcessing(false);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* Stripe Validation Error - Above PaymentElement */}
+      {validationErrors.stripe && (
+        <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg mb-4">
+          <p className="text-sm text-red-600 dark:text-red-400">{validationErrors.stripe}</p>
+        </div>
+      )}
+      
+      <PaymentElement 
+        options={{ 
+          layout: 'tabs', 
+          paymentMethodOrder: ['card'],
+          wallets: { applePay: 'never', googlePay: 'never' },
+          fields: {
+            billingDetails: {
+              name: 'never',
+              email: 'never',
+              phone: 'never',
+              address: 'never',
+            },
+          },
+        }} 
+        onChange={(event) => {
+          setStripeElementComplete(event.complete);
+          if (validationErrors.stripe) {
+            setValidationErrors(prev => ({
+              ...prev,
+              stripe: undefined
+            }));
+          }
+        }}
+      />
+      
+      {/* Single Place Order Button */}
+      <button
+        onClick={handlePlaceOrder}
+        disabled={isProcessing}
+        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-purple-600 hover:to-pink-600 disabled:from-gray-400 disabled:to-gray-400 text-white py-4 px-6 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl mt-4 text-lg"
+      >
+        {isProcessing ? (
+          <div className="flex items-center">
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+            Processing...
+          </div>
+        ) : (
+          <>
+            <Lock className="h-5 w-5 mr-2" />
+            Place Order - ${calculateTotal().toLocaleString()}
+          </>
+        )}
+      </button>
+    </div>
+  );
 }
 
 export default function CheckoutPage() {
@@ -29,6 +239,7 @@ export default function CheckoutPage() {
   const { state } = useCart();
   const { items: cartItems } = state;
   const { theme } = useTheme();
+  const { setCheckoutData, setOrderId } = useCheckout();
   
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({
     firstName: '',
@@ -40,11 +251,14 @@ export default function CheckoutPage() {
     city: '',
     state: '',
     zipCode: '',
-    country: 'United States'
+    country: 'US'
   });
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [isCreatingIntent, setIsCreatingIntent] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'error' | 'success' } | null>(null);
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
+  const [stripeElementComplete, setStripeElementComplete] = useState(false);
 
   const calculateSubtotal = () => {
     return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
@@ -65,6 +279,12 @@ export default function CheckoutPage() {
     const createIntent = async () => {
       try {
         setIsCreatingIntent(true);
+        console.log('🔧 Creating payment intent with:', {
+          items: cartItems,
+          customerInfo,
+          amount: calculateTotal(),
+        });
+        
         const response = await fetch('/api/create-payment-intent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -74,8 +294,15 @@ export default function CheckoutPage() {
             amount: calculateTotal(),
           }),
         });
-        if (!response.ok) throw new Error('Failed to initialize payment');
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('❌ Payment intent creation failed:', response.status, errorText);
+          throw new Error(`Failed to initialize payment: ${response.status}`);
+        }
+        
         const data = await response.json();
+        console.log('✅ Payment intent created, client secret received');
         setClientSecret(data.clientSecret);
       } catch (err) {
         setToast({ message: err instanceof Error ? err.message : 'Failed to initialize payment', type: 'error' });
@@ -161,12 +388,109 @@ export default function CheckoutPage() {
     loader: 'auto' as const,
   }), [clientSecret, appearance]);
 
+  const validateForm = (): boolean => {
+    const errors: ValidationErrors = {};
+    
+    // Required field validation
+    if (!customerInfo.firstName.trim()) {
+      errors.firstName = 'First name is required';
+    }
+    if (!customerInfo.lastName.trim()) {
+      errors.lastName = 'Last name is required';
+    }
+    if (!customerInfo.email.trim()) {
+      errors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerInfo.email)) {
+      errors.email = 'Please enter a valid email address';
+    }
+    if (!customerInfo.phone.trim()) {
+      errors.phone = 'Phone number is required';
+    }
+    if (!customerInfo.address.trim()) {
+      errors.address = 'Address is required';
+    }
+    if (!customerInfo.city.trim()) {
+      errors.city = 'City is required';
+    }
+    if (!customerInfo.state.trim()) {
+      errors.state = 'State is required';
+    }
+    if (!customerInfo.zipCode.trim()) {
+      errors.zipCode = 'ZIP code is required';
+    }
+    if (!customerInfo.country.trim()) {
+      errors.country = 'Country is required';
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const scrollToField = (fieldName: string) => {
+    const element = document.querySelector(`[name="${fieldName}"]`);
+    if (element) {
+      // Add a small delay for smoother animation
+      setTimeout(() => {
+        element.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center',
+          inline: 'nearest'
+        });
+        // Focus the element after scrolling
+        setTimeout(() => {
+          (element as HTMLElement).focus();
+          // Add a subtle highlight effect
+          element.classList.add('ring-2', 'ring-red-500', 'ring-opacity-50');
+          setTimeout(() => {
+            element.classList.remove('ring-2', 'ring-red-500', 'ring-opacity-50');
+          }, 2000);
+        }, 300);
+      }, 100);
+    }
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setCustomerInfo(prev => ({
       ...prev,
       [name]: value
     }));
+    
+    // Clear validation error when user starts typing
+    if (validationErrors[name as keyof ValidationErrors]) {
+      setValidationErrors(prev => ({
+        ...prev,
+        [name]: undefined
+      }));
+    }
+  };
+
+  const handlePaymentSuccess = (paymentIntentId: string) => {
+    console.log('🎉 Payment successful, storing checkout data:', {
+      customerInfo,
+      total: calculateTotal(),
+      items: cartItems
+    });
+    
+    // Store checkout data in Redux context
+    setCheckoutData(customerInfo, calculateTotal(), cartItems.map(item => ({
+      name: item.name,
+      quantity: item.quantity,
+      price: item.price
+    })));
+    
+    // Set the order ID
+    setOrderId(paymentIntentId);
+    
+    // Small delay to ensure data is stored before redirect
+    setTimeout(() => {
+      console.log('🚀 Redirecting to success page...');
+      router.push('/checkout/success');
+    }, 100);
+  };
+
+  const handlePaymentError = (message: string) => {
+    setToast({ message, type: 'error' });
   };
 
   if (cartItems.length === 0) {
@@ -278,8 +602,15 @@ export default function CheckoutPage() {
                           value={customerInfo.firstName}
                           onChange={handleInputChange}
                           required
-                          className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                          className={`w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white ${
+                            validationErrors.firstName 
+                              ? 'border-red-500 focus:ring-red-500' 
+                              : 'border-gray-200 dark:border-gray-600'
+                          }`}
                         />
+                        {validationErrors.firstName && (
+                          <p className="mt-1 text-sm text-red-600 dark:text-red-400">{validationErrors.firstName}</p>
+                        )}
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -291,8 +622,15 @@ export default function CheckoutPage() {
                           value={customerInfo.lastName}
                           onChange={handleInputChange}
                           required
-                          className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                          className={`w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white ${
+                            validationErrors.lastName 
+                              ? 'border-red-500 focus:ring-red-500' 
+                              : 'border-gray-200 dark:border-gray-600'
+                          }`}
                         />
+                        {validationErrors.lastName && (
+                          <p className="mt-1 text-sm text-red-600 dark:text-red-400">{validationErrors.lastName}</p>
+                        )}
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -304,8 +642,15 @@ export default function CheckoutPage() {
                           value={customerInfo.email}
                           onChange={handleInputChange}
                           required
-                          className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                          className={`w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white ${
+                            validationErrors.email 
+                              ? 'border-red-500 focus:ring-red-500' 
+                              : 'border-gray-200 dark:border-gray-600'
+                          }`}
                         />
+                        {validationErrors.email && (
+                          <p className="mt-1 text-sm text-red-600 dark:text-red-400">{validationErrors.email}</p>
+                        )}
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -317,8 +662,15 @@ export default function CheckoutPage() {
                           value={customerInfo.phone}
                           onChange={handleInputChange}
                           required
-                          className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                          className={`w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white ${
+                            validationErrors.phone 
+                              ? 'border-red-500 focus:ring-red-500' 
+                              : 'border-gray-200 dark:border-gray-600'
+                          }`}
                         />
+                        {validationErrors.phone && (
+                          <p className="mt-1 text-sm text-red-600 dark:text-red-400">{validationErrors.phone}</p>
+                        )}
                       </div>
                       <div className="md:col-span-2">
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -349,12 +701,19 @@ export default function CheckoutPage() {
                           value={customerInfo.address}
                           onChange={handleInputChange}
                           required
-                          className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                          className={`w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white ${
+                            validationErrors.address 
+                              ? 'border-red-500 focus:ring-red-500' 
+                              : 'border-gray-200 dark:border-gray-600'
+                          }`}
                         />
+                        {validationErrors.address && (
+                          <p className="mt-1 text-sm text-red-600 dark:text-red-400">{validationErrors.address}</p>
+                        )}
                       </div>
                       <div className="grid md:grid-cols-3 gap-4">
                         <div>
-                          <label className="block text sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             City *
                           </label>
                           <input
@@ -363,11 +722,18 @@ export default function CheckoutPage() {
                             value={customerInfo.city}
                             onChange={handleInputChange}
                             required
-                            className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                            className={`w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white ${
+                              validationErrors.city 
+                                ? 'border-red-500 focus:ring-red-500' 
+                                : 'border-gray-200 dark:border-gray-600'
+                            }`}
                           />
+                          {validationErrors.city && (
+                            <p className="mt-1 text-sm text-red-600 dark:text-red-400">{validationErrors.city}</p>
+                          )}
                         </div>
                         <div>
-                          <label className="block text sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             State *
                           </label>
                           <input
@@ -376,11 +742,18 @@ export default function CheckoutPage() {
                             value={customerInfo.state}
                             onChange={handleInputChange}
                             required
-                            className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                            className={`w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white ${
+                              validationErrors.state 
+                                ? 'border-red-500 focus:ring-red-500' 
+                                : 'border-gray-200 dark:border-gray-600'
+                            }`}
                           />
+                          {validationErrors.state && (
+                            <p className="mt-1 text-sm text-red-600 dark:text-red-400">{validationErrors.state}</p>
+                          )}
                         </div>
                         <div>
-                          <label className="block text sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             ZIP Code *
                           </label>
                           <input
@@ -389,8 +762,15 @@ export default function CheckoutPage() {
                             value={customerInfo.zipCode}
                             onChange={handleInputChange}
                             required
-                            className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                            className={`w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white ${
+                              validationErrors.zipCode 
+                                ? 'border-red-500 focus:ring-red-500' 
+                                : 'border-gray-200 dark:border-gray-600'
+                            }`}
                           />
+                          {validationErrors.zipCode && (
+                            <p className="mt-1 text-sm text-red-600 dark:text-red-400">{validationErrors.zipCode}</p>
+                          )}
                         </div>
                       </div>
                       <div>
@@ -402,26 +782,34 @@ export default function CheckoutPage() {
                           value={customerInfo.country}
                           onChange={handleInputChange}
                           required
-                          className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                          className={`w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white ${
+                            validationErrors.country 
+                              ? 'border-red-500 focus:ring-red-500' 
+                              : 'border-gray-200 dark:border-gray-600'
+                          }`}
                         >
-                          <option value="United States">United States</option>
-                          <option value="Canada">Canada</option>
-                          <option value="Mexico">Mexico</option>
-                          <option value="United Kingdom">United Kingdom</option>
-                          <option value="Germany">Germany</option>
-                          <option value="France">France</option>
-                          <option value="Australia">Australia</option>
-                          <option value="Japan">Japan</option>
-                          <option value="China">China</option>
-                          <option value="India">India</option>
+                          {countries
+                            .map((c) => ({ code: c.cca2, name: c.name.common }))
+                            .sort((a, b) => a.name.localeCompare(b.name))
+                            .map(({ code, name }) => (
+                              <option key={code} value={code}>
+                                {name}
+                              </option>
+                            ))}
                         </select>
+                        {validationErrors.country && (
+                          <p className="mt-1 text-sm text-red-600 dark:text-red-400">{validationErrors.country}</p>
+                        )}
                       </div>
                     </div>
                   </div>
 
-                  {/* Payment Information */}
+                                    {/* Payment Information */}
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Payment Information</h3>
+                    
+
+                    
                     <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                       <div className="flex items-center mb-4">
                         <CreditCard className="h-5 w-5 text-gray-600 dark:text-gray-300 mr-2" />
@@ -430,15 +818,29 @@ export default function CheckoutPage() {
                         </span>
                       </div>
 
+
+
                       {/* Stripe Payment Element */}
                       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                         {clientSecret ? (
                           <Elements stripe={stripePromise} options={elementsOptions}>
-                            <PaymentSection
+                            <PaymentForm
+                              clientSecret={clientSecret}
                               customerInfo={customerInfo}
-                              amount={calculateTotal()}
-                              onSuccess={(paymentIntentId) => router.push(`/checkout/success?payment_intent_id=${paymentIntentId}`)}
-                              onError={(msg) => setToast({ message: msg, type: 'error' })}
+                              onSuccess={handlePaymentSuccess}
+                              onError={handlePaymentError}
+                              isProcessing={isProcessing}
+                              setIsProcessing={setIsProcessing}
+                              validationErrors={validationErrors}
+                              setValidationErrors={setValidationErrors}
+                              stripeElementComplete={stripeElementComplete}
+                              setStripeElementComplete={setStripeElementComplete}
+                              calculateTotal={calculateTotal}
+                              validateForm={validateForm}
+                              scrollToField={scrollToField}
+                              setCheckoutData={setCheckoutData}
+                              setOrderId={setOrderId}
+                              cartItems={cartItems}
                             />
                           </Elements>
                         ) : (
@@ -447,6 +849,8 @@ export default function CheckoutPage() {
                           </div>
                         )}
                       </div>
+                      
+
                     </div>
                   </div>
                 </div>

@@ -22,7 +22,8 @@
     "prisma": "^6.13.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "stripe": "^18.4.0"
+    "stripe": "^18.4.0",
+    "world-countries": "^5.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
