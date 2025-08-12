@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { loadStripe } from '@stripe/stripe-js';
+import { loadStripe, StripeElementsOptions } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, CreditCard, Lock, Truck, Shield, XCircle, ShoppingCart } from 'lucide-react';
@@ -829,7 +829,7 @@ export default function CheckoutPage() {
                       {/* Stripe Payment Element */}
                       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                         {clientSecret ? (
-                          <Elements stripe={stripePromise} options={elementsOptions}>
+                          <Elements stripe={stripePromise} options={elementsOptions as StripeElementsOptions}>
                             <PaymentForm
                               clientSecret={clientSecret}
                               customerInfo={customerInfo}
