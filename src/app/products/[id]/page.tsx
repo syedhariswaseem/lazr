@@ -118,7 +118,7 @@ export default function ProductDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { addItem, getItemQuantity } = useCart();
-  const [product, setProduct] = useState<{ id: number; name: string; price: number; imageUrl: string; category: string; description: string; rating: number; reviewCount: number; inStock: boolean; stockCount: number } | null>(null);
+  const [product, setProduct] = useState<{ id: number; name: string; price: number; imageUrl: string; category: string; description: string; rating: number; reviewCount: number; inStock: boolean; stockCount: number; longDescription: string; features: string[]; warranty: string; delivery: string; specifications: Record<string, string> } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -126,7 +126,7 @@ export default function ProductDetailPage() {
   useEffect(() => {
     const productId = parseInt(params.id as string);
     const foundProduct = products.find(p => p.id === productId);
-    setProduct(foundProduct);
+    setProduct(foundProduct || null);
   }, [params.id]);
 
   const handleAddToCart = async () => {
@@ -135,8 +135,8 @@ export default function ProductDetailPage() {
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
       addItem({ id: product.id, name: product.name, price: product.price, imageUrl: product.imageUrl, category: product.category });
-      if ((window as { showToast?: (message: string, type: string) => void }).showToast) { 
-        (window as { showToast: (message: string, type: string) => void }).showToast(`${product.name} added to cart!`, 'success'); 
+      if ((window as unknown as { showToast?: (message: string, type: string) => void }).showToast) { 
+        (window as unknown as { showToast: (message: string, type: string) => void }).showToast(`${product.name} added to cart!`, 'success'); 
       }
     } finally {
       setIsLoading(false);
