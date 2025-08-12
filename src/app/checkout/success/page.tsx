@@ -37,8 +37,8 @@ export default function CheckoutSuccessPage() {
       
       setOrderDetails({
         orderId,
-        customerName: 'John Doe', // In real app, get from customer info
-        email: 'john@example.com', // In real app, get from customer info
+        customerName: 'John Doe', // Replace with real customer info
+        email: 'john@example.com', // Replace with real customer info
         total: 303000,
         items: [
           { name: 'Lazr Cutter Pro 5000', quantity: 1, price: 125000 },
@@ -60,21 +60,20 @@ export default function CheckoutSuccessPage() {
 
   if (!orderDetails) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-gray-700">Loading your order details...</p>
+          <p className="text-gray-700 dark:text-gray-300">Loading your order details...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 pt-20">
       {/* Success Header */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-blue-600"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <section className="relative overflow-hidden py-16 bg-gradient-to-r from-green-600 to-blue-600">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl">
               <CheckCircle className="h-12 w-12 text-green-600" />
@@ -90,11 +89,6 @@ export default function CheckoutSuccessPage() {
             </div>
           </div>
         </div>
-        
-        {/* Decorative elements */}
-        <div className="absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-full"></div>
-        <div className="absolute bottom-10 right-10 w-32 h-32 bg-white/5 rounded-full"></div>
-        <div className="absolute top-1/2 left-20 w-16 h-16 bg-white/10 rounded-full"></div>
       </section>
 
       {/* Order Details */}
@@ -104,9 +98,9 @@ export default function CheckoutSuccessPage() {
             {/* Main Order Info */}
             <div className="lg:col-span-2 space-y-8">
               {/* Order Summary Card */}
-              <div className="bg-white rounded-2xl shadow-xl p-8">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900">Order Summary</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Order Summary</h2>
                   <div className="flex items-center space-x-2">
                     <Shield className="h-5 w-5 text-green-600" />
                     <span className="text-sm text-green-600 font-medium">Secure Payment</span>
@@ -115,21 +109,21 @@ export default function CheckoutSuccessPage() {
 
                 <div className="space-y-4 mb-6">
                   {orderDetails.items.map((item, index) => (
-                    <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div key={index} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                       <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900">{item.name}</h4>
-                        <p className="text-sm text-gray-700">Quantity: {item.quantity}</p>
+                        <h4 className="font-semibold text-gray-900 dark:text-white">{item.name}</h4>
+                        <p className="text-sm text-gray-700 dark:text-gray-300">Quantity: {item.quantity}</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-semibold text-gray-900">${(item.price * item.quantity).toLocaleString()}</p>
-                        <p className="text-sm text-gray-700">${item.price.toLocaleString()} each</p>
+                        <p className="font-semibold text-gray-900 dark:text-white">${(item.price * item.quantity).toLocaleString()}</p>
+                        <p className="text-sm text-gray-700 dark:text-gray-300">${item.price.toLocaleString()} each</p>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                <div className="border-t pt-6">
-                  <div className="flex justify-between items-center text-lg font-bold text-gray-900">
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+                  <div className="flex justify-between items-center text-lg font-bold text-gray-900 dark:text-white">
                     <span>Total Amount</span>
                     <span className="text-2xl text-green-600">${orderDetails.total.toLocaleString()}</span>
                   </div>
@@ -137,25 +131,25 @@ export default function CheckoutSuccessPage() {
               </div>
 
               {/* Delivery Information */}
-              <div className="bg-white rounded-2xl shadow-xl p-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Delivery Information</h2>
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Delivery Information</h2>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="flex items-start space-x-4">
-                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/40 rounded-full flex items-center justify-center flex-shrink-0">
                       <Truck className="h-6 w-6 text-blue-600" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">Estimated Delivery</h3>
-                      <p className="text-gray-700">{orderDetails.estimatedDelivery}</p>
+                      <h3 className="font-semibold text-gray-900 dark:text-white">Estimated Delivery</h3>
+                      <p className="text-gray-700 dark:text-gray-300">{orderDetails.estimatedDelivery}</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-4">
-                    <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/40 rounded-full flex items-center justify-center flex-shrink-0">
                       <Clock className="h-6 w-6 text-purple-600" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">Processing Time</h3>
-                      <p className="text-gray-700">1-2 business days</p>
+                      <h3 className="font-semibold text-gray-900 dark:text-white">Processing Time</h3>
+                      <p className="text-gray-700 dark:text-gray-300">1-2 business days</p>
                     </div>
                   </div>
                 </div>
@@ -165,33 +159,17 @@ export default function CheckoutSuccessPage() {
               <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-xl p-8 text-white">
                 <h2 className="text-2xl font-bold mb-6">What Happens Next?</h2>
                 <div className="space-y-6">
-                  <div className="flex items-start space-x-4">
-                    <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                      <span className="text-white font-semibold text-sm">1</span>
+                  {["Order Confirmation","Processing & Quality Check","Shipping & Installation"].map((title, idx) => (
+                    <div key={title} className="flex items-start space-x-4">
+                      <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                        <span className="text-white font-semibold text-sm">{idx+1}</span>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold">{title}</h3>
+                        <p className="text-blue-100">{idx===0 ? "You'll receive an email confirmation with all order details within the next few minutes." : idx===1 ? "Our team will inspect and prepare your equipment for shipment within 24 hours." : "We'll contact you to schedule delivery and professional installation at your facility."}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-semibold">Order Confirmation</h3>
-                      <p className="text-blue-100">You'll receive an email confirmation with all order details within the next few minutes.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-4">
-                    <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                      <span className="text-white font-semibold text-sm">2</span>
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">Processing & Quality Check</h3>
-                      <p className="text-blue-100">Our team will inspect and prepare your equipment for shipment within 24 hours.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-4">
-                    <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                      <span className="text-white font-semibold text-sm">3</span>
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">Shipping & Installation</h3>
-                      <p className="text-blue-100">We'll contact you to schedule delivery and professional installation at your facility.</p>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -199,64 +177,60 @@ export default function CheckoutSuccessPage() {
             {/* Sidebar */}
             <div className="space-y-6">
               {/* Customer Info */}
-              <div className="bg-white rounded-2xl shadow-xl p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Customer Information</h3>
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Customer Information</h3>
                 <div className="space-y-3">
                   <div>
-                    <p className="text-sm text-gray-600">Name</p>
-                    <p className="font-semibold text-gray-900">{orderDetails.customerName}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Name</p>
+                    <p className="font-semibold text-gray-900 dark:text-white">{orderDetails.customerName}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Email</p>
-                    <p className="font-semibold text-gray-900">{orderDetails.email}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Email</p>
+                    <p className="font-semibold text-gray-900 dark:text-white">{orderDetails.email}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Order Date</p>
-                    <p className="font-semibold text-gray-900">{new Date().toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Order Date</p>
+                    <p className="font-semibold text-gray-900 dark:text-white">{new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                   </div>
                 </div>
               </div>
 
               {/* Support */}
-              <div className="bg-white rounded-2xl shadow-xl p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Need Help?</h3>
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Need Help?</h3>
                 <div className="space-y-4">
                   <div className="flex items-center space-x-3">
-                    <Mail className="h-5 w-5 text-gray-600" />
+                    <Mail className="h-5 w-5 text-gray-600 dark:text-gray-300" />
                     <div>
-                      <p className="font-medium text-gray-900">Email Support</p>
-                      <p className="text-sm text-gray-700">support@lasercutting.com</p>
+                      <p className="font-medium text-gray-900 dark:text-white">Email Support</p>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">support@lasercutting.com</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <Phone className="h-5 w-5 text-gray-600" />
+                    <Phone className="h-5 w-5 text-gray-600 dark:text-gray-300" />
                     <div>
-                      <p className="font-medium text-gray-900">Phone Support</p>
-                      <p className="text-sm text-gray-700">1-800-LASER-123</p>
+                      <p className="font-medium text-gray-900 dark:text-white">Phone Support</p>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">1-800-LASER-123</p>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Trust Badges */}
-              <div className="bg-white rounded-2xl shadow-xl p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Why Choose Us?</h3>
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Why Choose Us?</h3>
                 <div className="space-y-3">
                   <div className="flex items-center space-x-2">
                     <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                    <span className="text-sm text-gray-700">4.9/5 Customer Rating</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">4.9/5 Customer Rating</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Shield className="h-4 w-4 text-green-600" />
-                    <span className="text-sm text-gray-700">30-Day Return Policy</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">30-Day Return Policy</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Truck className="h-4 w-4 text-blue-600" />
-                    <span className="text-sm text-gray-700">Free Installation</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">Free Installation</span>
                   </div>
                 </div>
               </div>

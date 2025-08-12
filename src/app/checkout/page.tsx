@@ -6,6 +6,7 @@ import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, CreditCard, Lock, Truck, Shield, XCircle, ShoppingCart } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
+import { useTheme } from '@/contexts/ThemeContext';
 
 // Initialize Stripe
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
@@ -27,6 +28,7 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { state } = useCart();
   const { items: cartItems } = state;
+  const { theme } = useTheme();
   
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({
     firstName: '',
@@ -86,10 +88,72 @@ export default function CheckoutPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cartItems]);
 
-  const appearance = useMemo(
-    () => ({ theme: 'stripe' as const }),
-    []
-  );
+  const appearance = useMemo(() => {
+    if (theme === 'dark') {
+      return {
+        theme: 'night' as const,
+        variables: {
+          colorBackground: '#0f172a',
+          colorText: '#ffffff',
+          colorTextSecondary: '#cbd5e1',
+          colorPrimary: '#7c3aed',
+          colorDanger: '#ef4444',
+          borderRadius: '12px',
+          fontFamily: 'Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"',
+        },
+        rules: {
+          '.Input': {
+            backgroundColor: '#111827',
+            color: '#f9fafb',
+            border: '1px solid #374151',
+          },
+          '.Input:focus': {
+            border: '1px solid #7c3aed',
+          },
+          '.Label': {
+            color: '#e5e7eb',
+          },
+          '.Tab, .Block': {
+            backgroundColor: '#0f172a',
+            color: '#e5e7eb',
+            borderColor: '#374151',
+          },
+          '.Tab--selected, .Block--selected': {
+            backgroundColor: '#111827',
+            color: '#ffffff',
+          },
+          '.Error': {
+            color: '#fca5a5',
+          },
+        },
+      };
+    }
+
+    return {
+      theme: 'stripe' as const,
+      variables: {
+        colorBackground: '#ffffff',
+        colorText: '#0f172a',
+        colorTextSecondary: '#6b7280',
+        colorPrimary: '#2563eb',
+        borderRadius: '12px',
+        fontFamily: 'Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"',
+      },
+      rules: {
+        '.Input': {
+          backgroundColor: '#f9fafb',
+          color: '#111827',
+          border: '1px solid #e5e7eb',
+        },
+        '.Input:focus': {
+          border: '1px solid #2563eb',
+        },
+        '.Label': {
+          color: '#374151',
+        },
+      },
+    };
+  }, [theme]);
 
   const elementsOptions = useMemo(() => ({
     clientSecret: clientSecret ?? undefined,
@@ -107,15 +171,15 @@ export default function CheckoutPage() {
 
   if (cartItems.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 pt-20">
         {/* Header */}
-        <section className="bg-black text-white py-16">
+        <section className="py-16 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
                 Checkout
               </h1>
-              <p className="text-xl text-gray-200">
+              <p className="text-xl text-blue-100">
                 Complete your purchase securely
               </p>
             </div>
@@ -125,24 +189,24 @@ export default function CheckoutPage() {
         {/* Empty Cart State */}
         <section className="py-20">
           <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
-              <ShoppingCart className="h-12 w-12 text-gray-500" />
+            <div className="w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-6">
+              <ShoppingCart className="h-12 w-12 text-gray-500 dark:text-gray-300" />
             </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Your Cart is Empty</h2>
-            <p className="text-lg text-gray-700 mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Your Cart is Empty</h2>
+            <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
               You need to add items to your cart before proceeding to checkout.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
                 onClick={() => router.push('/products')}
-                className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors duration-200 inline-flex items-center justify-center shadow-lg hover:shadow-xl"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-3 rounded-full font-semibold transition-all duration-300 inline-flex items-center justify-center shadow-lg hover:shadow-xl"
               >
                 Browse Products
                 <ArrowLeft className="ml-2 h-5 w-5 rotate-180" />
               </button>
               <button
                 onClick={() => router.push('/cart')}
-                className="bg-gray-600 hover:bg-gray-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors duration-200 inline-flex items-center justify-center shadow-lg hover:shadow-xl"
+                className="bg-gray-600 hover:bg-gray-700 text-white px-8 py-3 rounded-full font-semibold transition-all duration-300 inline-flex items-center justify-center shadow-lg hover:shadow-xl"
               >
                 View Cart
                 <ShoppingCart className="ml-2 h-5 w-5" />
@@ -155,7 +219,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 pt-20">
       {/* Toast */}
       {toast && (
         <div className={`fixed bottom-6 right-6 z-50 flex items-center space-x-3 px-4 py-3 rounded-lg shadow-lg text-white ${toast.type === 'error' ? 'bg-red-600' : 'bg-green-600'}`}>
@@ -166,13 +230,13 @@ export default function CheckoutPage() {
       )}
 
       {/* Header */}
-      <section className="bg-black text-white py-16">
+      <section className="py-16 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
               Checkout
             </h1>
-            <p className="text-xl text-gray-300">
+            <p className="text-xl text-blue-100">
               Complete your purchase securely
             </p>
           </div>
@@ -185,16 +249,16 @@ export default function CheckoutPage() {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Checkout Form */}
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-lg shadow-lg p-6">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
                 <div className="flex items-center mb-6">
                   <button
                     onClick={() => router.back()}
-                    className="flex items-center text-gray-600 hover:text-gray-900 mr-4"
+                    className="flex items-center text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white mr-4"
                   >
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     Back to Cart
                   </button>
-                  <h2 className="text-2xl font-bold text-gray-900">
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                     Customer Information
                   </h2>
                 </div>
@@ -202,10 +266,10 @@ export default function CheckoutPage() {
                 <div className="space-y-6">
                   {/* Personal Information */}
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Personal Information</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Personal Information</h3>
                     <div className="grid md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           First Name *
                         </label>
                         <input
@@ -214,11 +278,11 @@ export default function CheckoutPage() {
                           value={customerInfo.firstName}
                           onChange={handleInputChange}
                           required
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                          className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Last Name *
                         </label>
                         <input
@@ -227,11 +291,11 @@ export default function CheckoutPage() {
                           value={customerInfo.lastName}
                           onChange={handleInputChange}
                           required
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                          className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Email *
                         </label>
                         <input
@@ -240,11 +304,11 @@ export default function CheckoutPage() {
                           value={customerInfo.email}
                           onChange={handleInputChange}
                           required
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                          className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Phone *
                         </label>
                         <input
@@ -253,11 +317,11 @@ export default function CheckoutPage() {
                           value={customerInfo.phone}
                           onChange={handleInputChange}
                           required
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                          className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                         />
                       </div>
                       <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Company
                         </label>
                         <input
@@ -265,7 +329,7 @@ export default function CheckoutPage() {
                           name="company"
                           value={customerInfo.company}
                           onChange={handleInputChange}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                          className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                         />
                       </div>
                     </div>
@@ -273,10 +337,10 @@ export default function CheckoutPage() {
 
                   {/* Shipping Address */}
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Shipping Address</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Shipping Address</h3>
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Address *
                         </label>
                         <input
@@ -285,12 +349,12 @@ export default function CheckoutPage() {
                           value={customerInfo.address}
                           onChange={handleInputChange}
                           required
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                          className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                         />
                       </div>
                       <div className="grid md:grid-cols-3 gap-4">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             City *
                           </label>
                           <input
@@ -299,11 +363,11 @@ export default function CheckoutPage() {
                             value={customerInfo.city}
                             onChange={handleInputChange}
                             required
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                            className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             State *
                           </label>
                           <input
@@ -312,11 +376,11 @@ export default function CheckoutPage() {
                             value={customerInfo.state}
                             onChange={handleInputChange}
                             required
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                            className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             ZIP Code *
                           </label>
                           <input
@@ -325,12 +389,12 @@ export default function CheckoutPage() {
                             value={customerInfo.zipCode}
                             onChange={handleInputChange}
                             required
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                            className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                           />
                         </div>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Country *
                         </label>
                         <select
@@ -338,7 +402,7 @@ export default function CheckoutPage() {
                           value={customerInfo.country}
                           onChange={handleInputChange}
                           required
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                          className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                         >
                           <option value="United States">United States</option>
                           <option value="Canada">Canada</option>
@@ -357,17 +421,17 @@ export default function CheckoutPage() {
 
                   {/* Payment Information */}
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Payment Information</h3>
-                    <div className="bg-gray-50 p-4 rounded-lg">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Payment Information</h3>
+                    <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                       <div className="flex items-center mb-4">
-                        <CreditCard className="h-5 w-5 text-gray-600 mr-2" />
-                        <span className="text-sm text-gray-700">
+                        <CreditCard className="h-5 w-5 text-gray-600 dark:text-gray-300 mr-2" />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">
                           Secure payment powered by Stripe
                         </span>
                       </div>
 
                       {/* Stripe Payment Element */}
-                      <div className="bg-white border border-gray-200 rounded-lg p-4">
+                      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                         {clientSecret ? (
                           <Elements stripe={stripePromise} options={elementsOptions}>
                             <PaymentSection
@@ -378,7 +442,7 @@ export default function CheckoutPage() {
                             />
                           </Elements>
                         ) : (
-                          <div className="text-sm text-gray-700">
+                          <div className="text-sm text-gray-700 dark:text-gray-300">
                             {isCreatingIntent ? 'Initializing secure payment...' : 'Unable to initialize payment.'}
                           </div>
                         )}
@@ -391,15 +455,15 @@ export default function CheckoutPage() {
 
             {/* Order Summary */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg shadow-lg p-6 sticky top-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 sticky top-24">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
                   Order Summary
                 </h2>
 
                 <div className="space-y-4 mb-6">
                   {cartItems.map((item) => (
                     <div key={item.id} className="flex items-center space-x-3">
-                      <div className="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
+                      <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden flex-shrink-0">
                         <img
                           src={item.imageUrl}
                           alt={item.name}
@@ -407,9 +471,9 @@ export default function CheckoutPage() {
                         />
                       </div>
                       <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900 text-sm">{item.name}</h4>
-                        <p className="text-gray-600 text-sm">Qty: {item.quantity}</p>
-                        <p className="font-semibold text-gray-900">
+                        <h4 className="font-semibold text-gray-900 dark:text-white text-sm">{item.name}</h4>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">Qty: {item.quantity}</p>
+                        <p className="font-semibold text-gray-900 dark:text-white">
                           ${(item.price * item.quantity).toLocaleString()}
                         </p>
                       </div>
@@ -417,23 +481,23 @@ export default function CheckoutPage() {
                   ))}
                 </div>
 
-                <div className="border-t pt-4 space-y-3">
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-3">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Subtotal</span>
-                    <span className="font-semibold">${calculateSubtotal().toLocaleString()}</span>
+                    <span className="text-gray-600 dark:text-gray-400">Subtotal</span>
+                    <span className="font-semibold text-gray-900 dark:text-white">${calculateSubtotal().toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Tax (8%)</span>
-                    <span className="font-semibold">${calculateTax().toLocaleString()}</span>
+                    <span className="text-gray-600 dark:text-gray-400">Tax (8%)</span>
+                    <span className="font-semibold text-gray-900 dark:text-white">${calculateTax().toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Shipping</span>
+                    <span className="text-gray-600 dark:text-gray-400">Shipping</span>
                     <span className="font-semibold text-green-600">Free</span>
                   </div>
-                  <div className="border-t pt-3">
+                  <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
                     <div className="flex justify-between">
-                      <span className="text-lg font-bold text-gray-900">Total</span>
-                      <span className="text-lg font-bold text-gray-900">
+                      <span className="text-lg font-bold text-gray-900 dark:text-white">Total</span>
+                      <span className="text-2xl font-bold text-gradient">
                         ${calculateTotal().toLocaleString()}
                       </span>
                     </div>
@@ -441,8 +505,8 @@ export default function CheckoutPage() {
                 </div>
 
                 {/* Security Badges */}
-                <div className="mt-6 pt-6 border-t">
-                  <div className="flex items-center justify-center space-x-4 text-sm text-gray-700">
+                <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center justify-center space-x-4 text-sm text-gray-700 dark:text-gray-300">
                     <div className="flex items-center">
                       <Shield className="h-4 w-4 mr-1" />
                       <span>Secure</span>
@@ -460,15 +524,15 @@ export default function CheckoutPage() {
       </section>
 
       {/* Trust Indicators */}
-      <section className="py-12 bg-white">
+      <section className="py-12 bg-white dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-3 gap-8 text-center">
             <div>
-              <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Shield className="h-6 w-6 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Secure Payment</h3>
-              <p className="text-gray-700">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Secure Payment</h3>
+              <p className="text-gray-700 dark:text-gray-400">
                 Your payment information is encrypted and secure
               </p>
             </div>
@@ -476,8 +540,8 @@ export default function CheckoutPage() {
               <div className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Truck className="h-6 w-6 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Fast Delivery</h3>
-              <p className="text-gray-700">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Fast Delivery</h3>
+              <p className="text-gray-700 dark:text-gray-400">
                 Quick delivery and installation of your equipment
               </p>
             </div>
@@ -485,8 +549,8 @@ export default function CheckoutPage() {
               <div className="w-12 h-12 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Lock className="h-6 w-6 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">30-Day Returns</h3>
-              <p className="text-gray-700">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">30-Day Returns</h3>
+              <p className="text-gray-700 dark:text-gray-400">
                 Hassle-free returns within 30 days of purchase
               </p>
             </div>
@@ -571,7 +635,7 @@ function PaymentSection({
       <button
         type="submit"
         disabled={!stripe || !elements || isConfirming}
-        className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white py-3 px-6 rounded-lg font-semibold transition-colors duration-200 flex items-center justify-center"
+        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-purple-600 hover:to-pink-600 disabled:from-gray-400 disabled:to-gray-400 text-white py-3 px-6 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl"
       >
         {isConfirming ? (
           <div className="flex items-center">

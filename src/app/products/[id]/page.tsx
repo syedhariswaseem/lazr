@@ -131,28 +131,11 @@ export default function ProductDetailPage() {
 
   const handleAddToCart = async () => {
     if (!product) return;
-    
     setIsLoading(true);
     try {
-      // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      addItem({
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        imageUrl: product.imageUrl,
-        category: product.category,
-      });
-
-      // Show success toast
-      if ((window as any).showToast) {
-        (window as any).showToast(`${product.name} added to cart!`, 'success');
-      }
-    } catch (error) {
-      if ((window as any).showToast) {
-        (window as any).showToast('Failed to add item to cart', 'error');
-      }
+      addItem({ id: product.id, name: product.name, price: product.price, imageUrl: product.imageUrl, category: product.category });
+      if ((window as any).showToast) { (window as any).showToast(`${product.name} added to cart!`, 'success'); }
     } finally {
       setIsLoading(false);
     }
@@ -160,10 +143,10 @@ export default function ProductDetailPage() {
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
-          <p className="text-gray-700">Loading product details...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-700 dark:text-gray-300">Loading product details...</p>
         </div>
       </div>
     );
@@ -172,24 +155,24 @@ export default function ProductDetailPage() {
   const currentQuantity = getItemQuantity(product.id);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 pt-20">
       {/* Header */}
-      <section className="bg-black text-white py-16">
+      <section className="py-16 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center mb-6">
             <button
               onClick={() => router.back()}
-              className="flex items-center text-gray-300 hover:text-white transition-colors"
+              className="flex items-center text-blue-100 hover:text-white transition-colors"
             >
               <ArrowLeft className="h-5 w-5 mr-2" />
               Back to Products
             </button>
           </div>
           <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
               {product.name}
             </h1>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            <p className="text-xl text-blue-100 max-w-3xl mx-auto">
               {product.description}
             </p>
           </div>
@@ -202,27 +185,17 @@ export default function ProductDetailPage() {
           <div className="grid lg:grid-cols-2 gap-12">
             {/* Product Images */}
             <div className="space-y-6">
-              <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-                <img
-                  src={product.imageUrl}
-                  alt={product.name}
-                  className="w-full h-96 object-cover"
-                />
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
+                <img src={product.imageUrl} alt={product.name} className="w-full h-96 object-cover" />
               </div>
               <div className="flex space-x-4">
                 {[1, 2, 3, 4].map((index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImage(index - 1)}
-                    className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
-                      selectedImage === index - 1 ? 'border-red-600' : 'border-gray-200'
-                    }`}
+                    className={`w-20 h-20 rounded-xl overflow-hidden border-2 transition-colors ${selectedImage === index - 1 ? 'border-blue-600' : 'border-gray-200 dark:border-gray-700'}`}
                   >
-                    <img
-                      src={product.imageUrl}
-                      alt={`${product.name} ${index}`}
-                      className="w-full h-full object-cover"
-                    />
+                    <img src={product.imageUrl} alt={`${product.name} ${index}`} className="w-full h-full object-cover" />
                   </button>
                 ))}
               </div>
@@ -231,22 +204,15 @@ export default function ProductDetailPage() {
             {/* Product Info */}
             <div className="space-y-8">
               {/* Basic Info */}
-              <div className="bg-white rounded-lg shadow-lg p-8">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-2">
                     <div className="flex items-center">
                       {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`h-5 w-5 ${
-                            i < Math.floor(product.rating)
-                              ? 'text-yellow-400 fill-current'
-                              : 'text-gray-300'
-                          }`}
-                        />
+                        <Star key={i} className={`h-5 w-5 ${i < Math.floor(product.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300 dark:text-gray-600'}`} />
                       ))}
                     </div>
-                    <span className="text-gray-700">({product.reviewCount} reviews)</span>
+                    <span className="text-gray-700 dark:text-gray-400">({product.reviewCount} reviews)</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <button className="p-2 text-gray-400 hover:text-red-600 transition-colors">
@@ -258,10 +224,10 @@ export default function ProductDetailPage() {
                   </div>
                 </div>
 
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">{product.name}</h2>
-                <p className="text-gray-700 mb-6">{product.longDescription}</p>
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">{product.name}</h2>
+                <p className="text-gray-700 dark:text-gray-300 mb-6">{product.longDescription}</p>
 
-                <div className="text-4xl font-bold text-gray-900 mb-6">
+                <div className="text-4xl font-bold text-gradient mb-6">
                   ${product.price.toLocaleString()}
                 </div>
 
@@ -271,7 +237,7 @@ export default function ProductDetailPage() {
                     <>
                       <CheckCircle className="h-5 w-5 text-green-600" />
                       <span className="text-green-600 font-medium">In Stock</span>
-                      <span className="text-gray-700">({product.stockCount} available)</span>
+                      <span className="text-gray-700 dark:text-gray-400">({product.stockCount} available)</span>
                     </>
                   ) : (
                     <>
@@ -284,20 +250,14 @@ export default function ProductDetailPage() {
                 {/* Quantity and Add to Cart */}
                 <div className="space-y-4">
                   <div className="flex items-center space-x-4">
-                    <label className="text-gray-700 font-medium">Quantity:</label>
+                    <label className="text-gray-700 dark:text-gray-300 font-medium">Quantity:</label>
                     <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                        className="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors border border-gray-300"
-                      >
-                        <span className="text-gray-700">-</span>
+                      <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-8 h-8 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full flex items-center justify-center transition-colors border border-gray-300 dark:border-gray-600">
+                        <span className="text-gray-700 dark:text-gray-300">-</span>
                       </button>
-                      <span className="w-12 text-center font-semibold text-gray-900">{quantity}</span>
-                      <button
-                        onClick={() => setQuantity(quantity + 1)}
-                        className="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors border border-gray-300"
-                      >
-                        <span className="text-gray-700">+</span>
+                      <span className="w-12 text-center font-semibold text-gray-900 dark:text-white">{quantity}</span>
+                      <button onClick={() => setQuantity(quantity + 1)} className="w-8 h-8 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full flex items-center justify-center transition-colors border border-gray-300 dark:border-gray-600">
+                        <span className="text-gray-700 dark:text-gray-300">+</span>
                       </button>
                     </div>
                   </div>
@@ -305,11 +265,7 @@ export default function ProductDetailPage() {
                   <button
                     onClick={handleAddToCart}
                     disabled={!product.inStock || isLoading}
-                    className={`w-full py-4 px-6 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center ${
-                      product.inStock && !isLoading
-                        ? 'bg-red-600 hover:bg-red-700 text-white shadow-lg hover:shadow-xl'
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    }`}
+                    className={`w-full py-4 px-6 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center ${!product.inStock ? 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed' : isLoading ? 'bg-blue-600 text-white' : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:shadow-lg hover:scale-105'}`}
                   >
                     {isLoading ? (
                       <>
@@ -335,33 +291,33 @@ export default function ProductDetailPage() {
               </div>
 
               {/* Features */}
-              <div className="bg-white rounded-lg shadow-lg p-8">
-                <h3 className="text-xl font-bold text-gray-900 mb-6">Key Features</h3>
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Key Features</h3>
                 <div className="grid md:grid-cols-2 gap-4">
                   {product.features.map((feature: string, index: number) => (
                     <div key={index} className="flex items-start space-x-3">
                       <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span className="text-gray-700">{feature}</span>
+                      <span className="text-gray-700 dark:text-gray-300">{feature}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Warranty & Delivery */}
-              <div className="bg-white rounded-lg shadow-lg p-8">
-                <h3 className="text-xl font-bold text-gray-900 mb-6">Warranty & Delivery</h3>
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Warranty & Delivery</h3>
                 <div className="space-y-4">
                   <div className="flex items-center space-x-3">
                     <Shield className="h-5 w-5 text-blue-600" />
-                    <span className="text-gray-700">{product.warranty}</span>
+                    <span className="text-gray-700 dark:text-gray-300">{product.warranty}</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <Truck className="h-5 w-5 text-green-600" />
-                    <span className="text-gray-700">{product.delivery}</span>
+                    <span className="text-gray-700 dark:text-gray-300">{product.delivery}</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <Clock className="h-5 w-5 text-purple-600" />
-                    <span className="text-gray-700">Estimated delivery: 5-7 business days</span>
+                    <span className="text-gray-700 dark:text-gray-300">Estimated delivery: 5-7 business days</span>
                   </div>
                 </div>
               </div>
@@ -370,13 +326,13 @@ export default function ProductDetailPage() {
 
           {/* Specifications */}
           <div className="mt-16">
-            <div className="bg-white rounded-lg shadow-lg p-8">
-              <h3 className="text-2xl font-bold text-gray-900 mb-8">Technical Specifications</h3>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">Technical Specifications</h3>
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {Object.entries(product.specifications).map(([key, value]) => (
-                  <div key={key} className="border-b border-gray-200 pb-4">
-                    <dt className="text-sm font-medium text-gray-600">{key}</dt>
-                    <dd className="text-lg font-semibold text-gray-900 mt-1">{value as string}</dd>
+                  <div key={key} className="border-b border-gray-200 dark:border-gray-700 pb-4">
+                    <dt className="text-sm font-medium text-gray-600 dark:text-gray-400">{key}</dt>
+                    <dd className="text-lg font-semibold text-gray-900 dark:text-white mt-1">{value as string}</dd>
                   </div>
                 ))}
               </div>
@@ -385,7 +341,7 @@ export default function ProductDetailPage() {
 
           {/* Related Products */}
           <div className="mt-16">
-            <h3 className="text-2xl font-bold text-gray-900 mb-8">Related Products</h3>
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">Related Products</h3>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {products
                 .filter(p => p.id !== product.id)
@@ -393,30 +349,26 @@ export default function ProductDetailPage() {
                 .map((relatedProduct) => (
                   <div
                     key={relatedProduct.id}
-                    className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer"
+                    className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow cursor-pointer"
                     onClick={() => router.push(`/products/${relatedProduct.id}`)}
                   >
-                    <div className="h-48 bg-gray-200">
-                      <img
-                        src={relatedProduct.imageUrl}
-                        alt={relatedProduct.name}
-                        className="w-full h-full object-cover"
-                      />
+                    <div className="h-48 bg-gray-200 dark:bg-gray-700">
+                      <img src={relatedProduct.imageUrl} alt={relatedProduct.name} className="w-full h-full object-cover" />
                     </div>
                     <div className="p-6">
-                      <h4 className="text-lg font-semibold text-gray-900 mb-2">
+                      <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                         {relatedProduct.name}
                       </h4>
-                      <p className="text-gray-700 text-sm mb-4 line-clamp-2">
+                      <p className="text-gray-700 dark:text-gray-300 text-sm mb-4 line-clamp-2">
                         {relatedProduct.description}
                       </p>
                       <div className="flex items-center justify-between">
-                        <span className="text-xl font-bold text-gray-900">
+                        <span className="text-xl font-bold text-gray-900 dark:text-white">
                           ${relatedProduct.price.toLocaleString()}
                         </span>
                         <div className="flex items-center space-x-1">
                           <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                          <span className="text-sm text-gray-700">{relatedProduct.rating}</span>
+                          <span className="text-sm text-gray-700 dark:text-gray-300">{relatedProduct.rating}</span>
                         </div>
                       </div>
                     </div>
