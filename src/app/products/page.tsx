@@ -85,7 +85,7 @@ export default function ProductsPage() {
     ? products 
     : products.filter(product => product.category === selectedCategory);
 
-  const handleAddToCart = async (product: any, e: React.MouseEvent) => {
+  const handleAddToCart = async (product: { id: number; name: string; price: number; imageUrl: string; category: string }, e: React.MouseEvent) => {
     e.stopPropagation();
     setLoadingStates(prev => ({ ...prev, [product.id]: true }));
     
@@ -103,8 +103,8 @@ export default function ProductsPage() {
     setLoadingStates(prev => ({ ...prev, [product.id]: false }));
     
     // Show success toast
-    if ((window as any).showToast) {
-      (window as any).showToast(`${product.name} added to cart!`, 'success');
+    if ((window as unknown as { showToast?: (message: string, type: string) => void }).showToast) {
+      (window as unknown as { showToast: (message: string, type: string) => void }).showToast(`${product.name} added to cart!`, 'success');
     }
   };
 
@@ -153,7 +153,7 @@ export default function ProductsPage() {
               </div>
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">No products found</h3>
               <p className="text-gray-600 dark:text-gray-400 mb-8">
-                No products found in the "{selectedCategory}" category.
+                No products found in the &ldquo;{selectedCategory}&rdquo; category.
               </p>
               <button
                 onClick={() => setSelectedCategory("All")}

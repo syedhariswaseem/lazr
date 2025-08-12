@@ -126,11 +126,11 @@ export const ToastContainer: React.FC = () => {
 
   // Expose showToast globally
   useEffect(() => {
-    (window as any).showToast = showToast;
+    (window as { showToast?: (message: string, type: string, duration?: number) => void }).showToast = showToast;
     return () => {
-      delete (window as any).showToast;
+      delete (window as { showToast?: (message: string, type: string, duration?: number) => void }).showToast;
     };
-  }, []);
+  }, [showToast]);
 
   return (
     <>

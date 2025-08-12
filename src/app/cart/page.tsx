@@ -266,7 +266,7 @@ export default function CartPage() {
                 </div>
 
                 <div className="mt-4 lg:mt-6 p-3 lg:p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
-                  <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2 text-sm lg:text-base">What's Included:</h3>
+                  <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2 text-sm lg:text-base">What&apos;s Included:</h3>
                   <ul className="text-xs lg:text-sm text-blue-800 dark:text-blue-200 space-y-1">
                     <li>• Free installation and training</li>
                     <li>• 3-year comprehensive warranty</li>

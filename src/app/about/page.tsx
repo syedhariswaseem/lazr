@@ -29,11 +29,11 @@ export default function AboutPage() {
               </p>
               <p className="text-lg text-gray-600 dark:text-gray-400 mb-6">
                 Our journey began with a simple mission: to make precision laser cutting
-                technology accessible to manufacturers of all sizes. Today, we're proud
+                technology accessible to manufacturers of all sizes. Today, we&apos;re proud
                 to be a trusted partner for thousands of businesses across the globe.
               </p>
               <p className="text-lg text-gray-600 dark:text-gray-400">
-                With over a decade of experience and continuous innovation, we've
+                With over a decade of experience and continuous innovation, we&apos;ve
                 established ourselves as the go-to provider for industrial laser
                 cutting machinery that delivers exceptional results.
               </p>
@@ -84,7 +84,7 @@ export default function AboutPage() {
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Innovation</h3>
               <p className="text-gray-600 dark:text-gray-400">
                 We continuously push the boundaries of laser cutting technology,
-                developing solutions for tomorrow's challenges.
+                developing solutions for tomorrow&apos;s challenges.
               </p>
             </div>
           </div>

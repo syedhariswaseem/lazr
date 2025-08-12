@@ -7,10 +7,10 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(request: NextRequest) {
   try {
-    const { items, customerInfo, amount } = await request.json();
+    const { items, customerInfo } = await request.json();
 
     // Create line items for Stripe
-    const lineItems = items.map((item: any) => ({
+    const lineItems = items.map((item: { name: string; category: string; imageUrl: string; price: number; quantity: number }) => ({
       price_data: {
         currency: 'usd',
         product_data: {
