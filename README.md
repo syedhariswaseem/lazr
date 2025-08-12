@@ -158,6 +158,5 @@ This project showcases modern e-commerce development with enterprise-grade featu
 
 ## 📞 Contact
 
-- **Website**: [lazr.com](https://lazr.com)
-- **Email**: info@lazr.com
-- **Sales**: sales@lazr.com
+- **Website**: [lazr.com](https://lazr.vercel.app)
+- **Email**: shharis81@gmail.com
