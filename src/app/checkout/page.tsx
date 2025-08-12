@@ -630,7 +630,21 @@ function PaymentSection({
 
   return (
     <form onSubmit={handlePay} className="space-y-4">
-      <PaymentElement options={{ layout: 'tabs' }} />
+      <PaymentElement 
+        options={{ 
+          layout: 'tabs', 
+          paymentMethodOrder: ['card'],
+          wallets: { applePay: 'never', googlePay: 'never' },
+          fields: {
+            billingDetails: {
+              name: 'never',
+              email: 'never',
+              phone: 'never',
+              address: 'never',
+            },
+          },
+        }} 
+      />
 
       <button
         type="submit"
