@@ -158,14 +158,17 @@ function PaymentForm({
         return;
       }
 
-      if (result.paymentIntent) {
-        const paymentIntent = result.paymentIntent;
+      if ('paymentIntent' in result && result.paymentIntent) {
+        const paymentIntent = result.paymentIntent as {
+          id: string;
+          status: string;
+        };
         
         if (paymentIntent.status === 'succeeded') {
           onSuccess(paymentIntent.id);
           return;
         }
-
+    
         if (paymentIntent.status === 'processing') {
           onError('Payment is processing. You will receive an email confirmation shortly.');
           setIsProcessing(false);
