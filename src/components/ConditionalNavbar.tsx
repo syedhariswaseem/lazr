@@ -1,0 +1,11 @@
+'use client';
+
+import { usePathname } from 'next/navigation';
+import Navbar from './Navbar';
+
+export default function ConditionalNavbar() {
+  const pathname = usePathname();
+  const isSuccessPage = pathname.includes('/checkout/success');
+
+  return <Navbar simplified={isSuccessPage} />;
+} 
