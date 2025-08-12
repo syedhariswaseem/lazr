@@ -304,7 +304,7 @@ export default function HomePage() {
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
               Don&apos;t just take our word for it. Here&apos;s what industry leaders have to say about Lazr.
-            </p>
+              </p>
             </div>
 
           <div className="relative max-w-4xl mx-auto">

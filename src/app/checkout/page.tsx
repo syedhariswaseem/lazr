@@ -94,7 +94,7 @@ function PaymentForm({
 
     // Check if Stripe element is complete
     if (!stripeElementComplete) {
-      setValidationErrors(prev => ({ ...prev, stripe: 'Please complete your payment details' }));
+      setValidationErrors((prev: ValidationErrors) => ({ ...prev, stripe: 'Please complete your payment details' }));
       return;
     }
 
@@ -204,7 +204,7 @@ function PaymentForm({
         onChange={(event) => {
           setStripeElementComplete(event.complete);
           if (validationErrors.stripe) {
-            setValidationErrors(prev => ({
+            setValidationErrors((prev: ValidationErrors) => ({
               ...prev,
               stripe: undefined
             }));
