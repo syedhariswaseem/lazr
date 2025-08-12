@@ -118,7 +118,7 @@ export default function ProductDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { addItem, getItemQuantity } = useCart();
-  const [product, setProduct] = useState<any>(null);
+  const [product, setProduct] = useState<{ id: number; name: string; price: number; imageUrl: string; category: string; description: string; rating: number; reviewCount: number; inStock: boolean; stockCount: number } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -135,7 +135,9 @@ export default function ProductDetailPage() {
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
       addItem({ id: product.id, name: product.name, price: product.price, imageUrl: product.imageUrl, category: product.category });
-      if ((window as any).showToast) { (window as any).showToast(`${product.name} added to cart!`, 'success'); }
+      if ((window as { showToast?: (message: string, type: string) => void }).showToast) { 
+        (window as { showToast: (message: string, type: string) => void }).showToast(`${product.name} added to cart!`, 'success'); 
+      }
     } finally {
       setIsLoading(false);
     }

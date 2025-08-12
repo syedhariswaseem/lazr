@@ -255,7 +255,7 @@ export default function HomePage() {
               </p>
               <p className="text-lg text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
                 Our journey began with a simple mission: to make precision laser cutting 
-                technology accessible to manufacturers of all sizes. Today, we're proud 
+                technology accessible to manufacturers of all sizes. Today, we&apos;re proud 
                 to be a trusted partner for thousands of businesses across the globe.
               </p>
               <div className="flex items-center space-x-6">
@@ -303,7 +303,7 @@ export default function HomePage() {
               What Our <span className="text-gradient">Clients Say</span>
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-              Don't just take our word for it. Here's what industry leaders have to say about Lazr.
+              Don&apos;t just take our word for it. Here&apos;s what industry leaders have to say about Lazr.
             </p>
             </div>
 
@@ -315,7 +315,7 @@ export default function HomePage() {
                 ))}
               </div>
               <p className="text-lg text-gray-700 dark:text-gray-300 mb-6 italic">
-                "{testimonials[currentTestimonial].content}"
+                &ldquo;{testimonials[currentTestimonial].content}&rdquo;
               </p>
               <div>
                 <div className="font-semibold text-gray-900 dark:text-white">

@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
       if (meta.items) {
         const parsed = JSON.parse(meta.items);
         if (Array.isArray(parsed)) {
-          items = parsed.map((it: any) => ({
+          items = parsed.map((it: { name?: string; quantity?: number; price?: number }) => ({
             name: String(it.name ?? 'Item'),
             quantity: Number(it.quantity ?? 1),
             price: Number(it.price ?? 0),

@@ -15,8 +15,8 @@ export default function ContactPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if ((window as any).showToast) {
-      (window as any).showToast('Message sent successfully!', 'success');
+    if ((window as { showToast?: (message: string, type: string) => void }).showToast) {
+      (window as { showToast: (message: string, type: string) => void }).showToast('Message sent successfully!', 'success');
     }
     setFormData({ name: '', email: '', company: '', phone: '', message: '', productInterest: '' });
   };

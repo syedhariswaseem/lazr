@@ -63,14 +63,14 @@ export default function CheckoutSuccessPage() {
     // Fallback: Create order details from cart data
     console.log('⚠️ No checkout context data, using cart fallback');
     const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
-    const total = cartItems.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
+    const total = cartItems.reduce((sum: number, item: { price: number; quantity: number }) => sum + (item.price * item.quantity), 0);
     
     const fallbackOrderDetails: OrderDetails = {
       orderId: `ORD-${Date.now().toString().slice(-8).toUpperCase()}`,
       customerName: 'Customer',
       email: 'customer@example.com',
       total,
-      items: cartItems.map((item: any) => ({
+      items: cartItems.map((item: { name: string; quantity: number; price: number }) => ({
         name: item.name,
         quantity: item.quantity,
         price: item.price
@@ -141,7 +141,7 @@ export default function CheckoutSuccessPage() {
               Order Confirmed!
             </h1>
             <p className="text-xl text-green-100 max-w-2xl mx-auto">
-              Thank you for your purchase. Your order has been successfully placed and we're preparing it for shipment.
+              Thank you for your purchase. Your order has been successfully placed and we&apos;re preparing it for shipment.
             </p>
             <div className="mt-8 bg-white/10 backdrop-blur-sm rounded-2xl p-6 inline-block">
               <p className="text-white text-lg font-semibold">Order #{orderDetails.orderId}</p>
@@ -224,7 +224,7 @@ export default function CheckoutSuccessPage() {
                     </div>
                     <div>
                       <h3 className="font-semibold">Order Confirmation</h3>
-                      <p className="text-blue-100">You'll receive an email confirmation with all order details.</p>
+                      <p className="text-blue-100">You&apos;ll receive an email confirmation with all order details.</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-4">
@@ -242,7 +242,7 @@ export default function CheckoutSuccessPage() {
                     </div>
                     <div>
                       <h3 className="font-semibold">Shipping</h3>
-                      <p className="text-blue-100">We'll contact you to arrange delivery and installation.</p>
+                      <p className="text-blue-100">We&apos;ll contact you to arrange delivery and installation.</p>
                     </div>
                   </div>
                 </div>
