@@ -13,31 +13,16 @@ export async function POST(request: NextRequest) {
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(amount * 100), // Convert to cents
       currency: 'usd',
-      automatic_payment_methods: {
-        enabled: true,
-      },
+      // Restrict to card only to simplify Payment Element (hide Cash App, etc.)
+      payment_method_types: ['card'],
       metadata: {
         customer_name: `${customerInfo.firstName} ${customerInfo.lastName}`,
         customer_email: customerInfo.email,
         customer_phone: customerInfo.phone,
         customer_company: customerInfo.company,
-        shipping_address: customerInfo.address,
-        shipping_city: customerInfo.city,
-        shipping_state: customerInfo.state,
-        shipping_zip: customerInfo.zipCode,
-        shipping_country: customerInfo.country,
         items: JSON.stringify(items),
       },
-      shipping: {
-        name: `${customerInfo.firstName} ${customerInfo.lastName}`,
-        address: {
-          line1: customerInfo.address,
-          city: customerInfo.city,
-          state: customerInfo.state,
-          postal_code: customerInfo.zipCode,
-          country: customerInfo.country,
-        },
-      },
+      // Do not request shipping/billing address collection to avoid extra fields
     });
 
     return NextResponse.json({
