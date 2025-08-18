@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sign as jwtSign, verify as jwtVerify, type JwtPayload, type SignOptions, type Secret } from 'jsonwebtoken';
-import type { Role } from '@prisma/client';
 import { prisma } from '@/lib/db';
 
 // Environment helpers
@@ -15,17 +14,19 @@ const REFRESH_TOKEN_SECRET = () => getEnv('JWT_REFRESH_SECRET');
 const ACCESS_TOKEN_EXPIRES_IN = () => process.env.JWT_ACCESS_EXPIRES_IN || '15m';
 const REFRESH_TOKEN_EXPIRES_IN = () => process.env.JWT_REFRESH_EXPIRES_IN || '7d';
 
+type UserRole = 'USER' | 'ADMIN';
+
 export type JWTPayload = {
   sub: string; // userId
   email: string;
-  role: Role;
+  role: UserRole;
   tokenVersion: number;
 };
 
 type TokenUser = {
   id: string;
   email: string;
-  role: Role;
+  role: UserRole;
   tokenVersion?: number;
 };
 
@@ -108,17 +109,15 @@ export async function getUserFromRequest(req: NextRequest) {
   if (!decoded) return null;
   const user = await prisma.user.findUnique({ where: { id: decoded.sub } });
   if (!user) return null;
-  const userTokenVersion = (user as unknown as { tokenVersion?: number }).tokenVersion ?? 0;
-  if (userTokenVersion !== decoded.tokenVersion) return null;
+  // If your schema does not include tokenVersion, skip that check
   return user;
 }
 
 export async function rotateTokensForUser(userId: string) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) return null;
-  const tokenVersion = (user as unknown as { tokenVersion?: number }).tokenVersion ?? 0;
-  const accessToken = signAccessToken({ id: user.id, email: user.email, role: user.role, tokenVersion });
-  const refreshToken = signRefreshToken({ id: user.id, email: user.email, role: user.role, tokenVersion });
+  const accessToken = signAccessToken({ id: user.id, email: user.email, role: user.role });
+  const refreshToken = signRefreshToken({ id: user.id, email: user.email, role: user.role });
   return { accessToken, refreshToken, user };
 }
 

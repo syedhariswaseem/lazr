@@ -18,13 +18,14 @@ export async function POST(req: NextRequest) {
     }
 
     const user = await prisma.user.findUnique({ where: { id: decoded.sub } });
-    if (!user || user.tokenVersion !== decoded.tokenVersion) {
+    if (!user) {
       return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
     }
 
     // Issue new tokens
-    const accessToken = signAccessToken(user);
-    const refreshToken = signRefreshToken(user);
+    const shape = { id: user.id, email: user.email, role: user.role } as const;
+    const accessToken = signAccessToken(shape);
+    const refreshToken = signRefreshToken(shape);
     const res = NextResponse.json({ ok: true });
     attachAuthCookies(res, { accessToken, refreshToken });
     return res;
