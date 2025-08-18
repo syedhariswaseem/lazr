@@ -1,9 +1,10 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ShoppingCart, Menu, X, Sun, Moon } from 'lucide-react';
+import { ShoppingCart, Menu, X, Sun, Moon, User as UserIcon, LogOut } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface NavbarProps {
   simplified?: boolean;
@@ -14,6 +15,8 @@ export default function Navbar({ simplified = false }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const { state } = useCart();
   const { theme, toggleTheme } = useTheme();
+  const { user, logout } = useAuth();
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -82,6 +85,47 @@ export default function Navbar({ simplified = false }: NavbarProps) {
                 <Sun className="w-5 h-5 text-gray-300 group-hover:text-yellow-400 transition-colors duration-200" />
               )}
             </button>
+
+            {/* User */}
+            {!simplified && (
+              <div className="relative">
+                {user ? (
+                  <button
+                    onClick={() => setUserMenuOpen((v) => !v)}
+                    className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 group"
+                    aria-label="User menu"
+                  >
+                    <UserIcon className="w-5 h-5 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200" />
+                  </button>
+                ) : (
+                  <Link
+                    href="/login"
+                    className="px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
+                    Sign in
+                  </Link>
+                )}
+                {user && userMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-900 border border-gray-200/20 dark:border-gray-700/20 rounded-xl shadow-lg overflow-hidden">
+                    <div className="px-4 py-3 border-b border-gray-200/20 dark:border-gray-700/20">
+                      <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{user.name}</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 truncate">{user.email}</p>
+                    </div>
+                    <button
+                      onClick={async () => {
+                        setUserMenuOpen(false);
+                        await logout();
+                        window.showToast?.('Signed out', 'success');
+                      }}
+                      className="w-full flex items-center gap-2 px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Sign out
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Cart */}
             {!simplified && (

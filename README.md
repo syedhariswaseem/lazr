@@ -55,9 +55,20 @@ npm run dev
 
 ### Environment Variables
 ```env
+# Stripe
 STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key
 STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
+
+# Database
+DATABASE_URL="file:./dev.db"
+
+# JWT Auth
+JWT_ACCESS_SECRET=your_access_secret
+JWT_REFRESH_SECRET=your_refresh_secret
+# Optional
+# JWT_ACCESS_EXPIRES_IN=15m
+# JWT_REFRESH_EXPIRES_IN=7d
 ```
 
 ## 📱 Features Overview
