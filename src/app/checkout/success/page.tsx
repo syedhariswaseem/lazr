@@ -57,17 +57,20 @@ export default function CheckoutSuccessPage() {
       console.log('Created order details from context:', orderDetails);
 
       // Create order in backend
-      try {
-        await fetch('/api/orders', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            items: checkoutState.orderItems.map((i: any) => ({ productId: i.id ?? i.productId, quantity: i.quantity })),
-          }),
-        });
-      } catch (e) {
-        console.error('Failed to persist order', e);
-      }
+      (async () => {
+        try {
+          const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
+          await fetch('/api/orders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              items: cartItems.map((i: any) => ({ productId: i.id, quantity: i.quantity })),
+            }),
+          });
+        } catch (e) {
+          console.error('Failed to persist order', e);
+        }
+      })();
 
       setOrderDetails(orderDetails);
       clearCart();
