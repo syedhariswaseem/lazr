@@ -73,7 +73,7 @@ function PaymentForm({
   scrollToField: (fieldName: string) => void;
   setCheckoutData: (customerInfo: CustomerInfo, orderTotal: number, orderItems: Array<{ name: string; quantity: number; price: number }>) => void;
   setOrderId: (orderId: string) => void;
-  cartItems: Array<{ id: number; name: string; quantity: number; price: number; imageUrl: string }>;
+  cartItems: Array<{ id: string; name: string; quantity: number; price: number; imageUrl: string }>;
 }) {
   const stripe = useStripe();
   const elements = useElements();
@@ -109,11 +109,12 @@ function PaymentForm({
     // Store checkout data BEFORE payment processing
     console.log('💾 Storing checkout data before payment...');
     setCheckoutData(customerInfo, calculateTotal(), cartItems.map(item => ({
+      productId: item.id,
       name: item.name,
       quantity: item.quantity,
       price: item.price
     })));
-    
+
     // Set a temporary order ID
     setOrderId(`temp_${Date.now()}`);
 
@@ -131,8 +132,8 @@ function PaymentForm({
       const result = await stripe.confirmPayment({
         elements,
         clientSecret,
+        redirect: 'if_required',
         confirmParams: {
-          return_url: `${window.location.origin}/checkout/success`,
           receipt_email: customerInfo.email || undefined,
           payment_method_data: {
             billing_details: {
@@ -165,10 +166,27 @@ function PaymentForm({
         };
         
         if (paymentIntent.status === 'succeeded') {
+          try {
+            // Persist the order immediately on payment success
+            const orderRes = await fetch('/api/orders', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                items: cartItems.map(i => ({ productId: i.id, quantity: i.quantity })),
+              }),
+            });
+            if (!orderRes.ok) {
+              const err = await orderRes.json().catch(() => ({}));
+              console.error('Order creation failed', err);
+            }
+          } catch (e) {
+            console.error('Failed to create order on payment success', e);
+          }
+
           onSuccess(paymentIntent.id);
           return;
         }
-    
+
         if (paymentIntent.status === 'processing') {
           onError('Payment is processing. You will receive an email confirmation shortly.');
           setIsProcessing(false);

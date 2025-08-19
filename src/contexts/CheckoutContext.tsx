@@ -20,6 +20,7 @@ interface CheckoutState {
   orderId: string | null;
   orderTotal: number | null;
   orderItems: Array<{
+    productId: string;
     name: string;
     quantity: number;
     price: number;
@@ -28,7 +29,7 @@ interface CheckoutState {
 }
 
 type CheckoutAction =
-  | { type: 'SET_CHECKOUT_DATA'; payload: { customerInfo: CustomerInfo; orderTotal: number; orderItems: Array<{ name: string; quantity: number; price: number }> } }
+  | { type: 'SET_CHECKOUT_DATA'; payload: { customerInfo: CustomerInfo; orderTotal: number; orderItems: Array<{ productId: string; name: string; quantity: number; price: number }> } }
   | { type: 'SET_ORDER_ID'; payload: string }
   | { type: 'CLEAR_CHECKOUT_DATA' }
   | { type: 'SET_LOADING'; payload: boolean };
@@ -80,7 +81,7 @@ function checkoutReducer(state: CheckoutState, action: CheckoutAction): Checkout
 
 interface CheckoutContextType {
   state: CheckoutState;
-  setCheckoutData: (customerInfo: CustomerInfo, orderTotal: number, orderItems: Array<{ name: string; quantity: number; price: number }>) => void;
+  setCheckoutData: (customerInfo: CustomerInfo, orderTotal: number, orderItems: Array<{ productId: string; name: string; quantity: number; price: number }>) => void;
   setOrderId: (orderId: string) => void;
   clearCheckoutData: () => void;
 }
@@ -129,7 +130,7 @@ export const CheckoutProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, [state.customerInfo, state.orderTotal, state.orderItems]);
 
-  const setCheckoutData = (customerInfo: CustomerInfo, orderTotal: number, orderItems: Array<{ name: string; quantity: number; price: number }>) => {
+  const setCheckoutData = (customerInfo: CustomerInfo, orderTotal: number, orderItems: Array<{ productId: string; name: string; quantity: number; price: number }>) => {
     console.log('CheckoutContext: setCheckoutData called with:', { customerInfo, orderTotal, orderItems });
     dispatch({ type: 'SET_CHECKOUT_DATA', payload: { customerInfo, orderTotal, orderItems } });
   };
