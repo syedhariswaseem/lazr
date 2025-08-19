@@ -4,9 +4,6 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ShoppingCart, Star, Truck, Shield, Clock, ArrowLeft, Heart, Share2, CheckCircle, Loader2 } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
-
-// Mock product data - in a real app, this would come from an API
-const products = [
   {
     id: 1,
     name: "Lazr Cutter Pro 5000",
@@ -114,19 +111,40 @@ const products = [
   }
 ];
 
+type Product = {
+  id: string;
+  name: string;
+  price: number;
+  imageUrl: string;
+  category: string;
+  description: string;
+  rating: number;
+  inStock: boolean;
+  stockCount: number;
+};
+
 export default function ProductDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { addItem, getItemQuantity } = useCart();
-  const [product, setProduct] = useState<{ id: number; name: string; price: number; imageUrl: string; category: string; description: string; rating: number; reviewCount: number; inStock: boolean; stockCount: number; longDescription: string; features: string[]; warranty: string; delivery: string; specifications: Record<string, string> } | null>(null);
+  const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
-    const productId = parseInt(params.id as string);
-    const foundProduct = products.find(p => p.id === productId);
-    setProduct(foundProduct || null);
+    const productId = params.id as string;
+    const load = async () => {
+      try {
+        const res = await fetch(`/api/products/${productId}`, { cache: 'no-store' });
+        if (!res.ok) return setProduct(null);
+        const data = await res.json();
+        setProduct(data);
+      } catch {
+        setProduct(null);
+      }
+    };
+    load();
   }, [params.id]);
 
   const handleAddToCart = async () => {
@@ -135,7 +153,7 @@ export default function ProductDetailPage() {
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
       addItem({ id: product.id, name: product.name, price: product.price, imageUrl: product.imageUrl, category: product.category });
-      if ((window as unknown as { showToast?: (message: string, type: string) => void }).showToast) { 
+      if ((window as unknown as { showToast?: (message: string, type: string) => void }).showToast) {
         (window as unknown as { showToast: (message: string, type: string) => void }).showToast(`${product.name} added to cart!`, 'success'); 
       }
     } finally {

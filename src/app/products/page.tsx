@@ -1,91 +1,50 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Star, ShoppingCart, Loader2, Filter } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 
-const products = [
-  {
-    id: 1,
-    name: "Lazr Cutter Pro 5000",
-    description: "High-power CO2 laser cutting system with 5000W output for industrial applications",
-    price: 125000,
-    category: "Industrial",
-    imageUrl: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=500&h=300&fit=crop",
-    rating: 4.8,
-    inStock: true,
-    stockCount: 5
-  },
-  {
-    id: 2,
-    name: "Fiber Laser Cutter Elite 3000",
-    description: "Advanced fiber laser technology for precise metal cutting and engraving",
-    price: 89000,
-    category: "Metal Cutting",
-    imageUrl: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=500&h=300&fit=crop",
-    rating: 4.9,
-    inStock: true,
-    stockCount: 3
-  },
-  {
-    id: 3,
-    name: "Compact Laser Cutter Mini 1000",
-    description: "Compact and portable laser cutting solution for small workshops",
-    price: 45000,
-    category: "Compact",
-    imageUrl: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=500&h=300&fit=crop",
-    rating: 4.6,
-    inStock: true,
-    stockCount: 8
-  },
-  {
-    id: 4,
-    name: "Automated Laser System Max 8000",
-    description: "Fully automated laser cutting system with robotic material handling",
-    price: 250000,
-    category: "Automated",
-    imageUrl: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=500&h=300&fit=crop",
-    rating: 4.9,
-    inStock: false,
-    stockCount: 0
-  },
-  {
-    id: 5,
-    name: "3D Laser Cutter Advanced",
-    description: "3D laser cutting and engraving system for complex geometries",
-    price: 180000,
-    category: "3D Cutting",
-    imageUrl: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=500&h=300&fit=crop",
-    rating: 4.7,
-    inStock: true,
-    stockCount: 2
-  },
-  {
-    id: 6,
-    name: "Water Jet Laser Hybrid",
-    description: "Hybrid laser and water jet cutting system for versatile material processing",
-    price: 320000,
-    category: "Hybrid",
-    imageUrl: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=500&h=300&fit=crop",
-    rating: 4.8,
-    inStock: true,
-    stockCount: 1
-  }
-];
 
 const categories = ["All", "Industrial", "Metal Cutting", "Compact", "Automated", "3D Cutting", "Hybrid"];
 
+type Product = {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  imageUrl: string;
+  rating: number;
+  inStock: boolean;
+  stockCount: number;
+};
+
 export default function ProductsPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [loadingStates, setLoadingStates] = useState<{ [key: number]: boolean }>({});
+  const [loadingStates, setLoadingStates] = useState<{ [key: string]: boolean }>({});
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
   const { addItem, getItemQuantity } = useCart();
 
-  const filteredProducts = selectedCategory === "All" 
-    ? products 
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await fetch('/api/products', { cache: 'no-store' });
+        const data = await res.json();
+        setProducts(data);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, []);
+
+  const filteredProducts = selectedCategory === "All"
+    ? products
     : products.filter(product => product.category === selectedCategory);
 
-  const handleAddToCart = async (product: { id: number; name: string; price: number; imageUrl: string; category: string }, e: React.MouseEvent) => {
+  const handleAddToCart = async (product: { id: string; name: string; price: number; imageUrl: string; category: string }, e: React.MouseEvent) => {
     e.stopPropagation();
     setLoadingStates(prev => ({ ...prev, [product.id]: true }));
     
@@ -107,6 +66,14 @@ export default function ProductsPage() {
       (window as unknown as { showToast: (message: string, type: string) => void }).showToast(`${product.name} added to cart!`, 'success');
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 pt-20">

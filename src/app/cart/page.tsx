@@ -7,9 +7,9 @@ import { useCart } from '@/contexts/CartContext';
 export default function CartPage() {
   const { state, updateQuantity, removeItem } = useCart();
   const router = useRouter();
-  const [isUpdating, setIsUpdating] = useState<{ [key: number]: boolean }>({});
+  const [isUpdating, setIsUpdating] = useState<{ [key: string]: boolean }>({});
 
-  const handleQuantityChange = async (id: number, newQuantity: number) => {
+  const handleQuantityChange = async (id: string, newQuantity: number) => {
     if (newQuantity < 1) return;
     
     setIsUpdating(prev => ({ ...prev, [id]: true }));
@@ -18,7 +18,7 @@ export default function CartPage() {
     setIsUpdating(prev => ({ ...prev, [id]: false }));
   };
 
-  const handleRemoveItem = async (id: number) => {
+  const handleRemoveItem = async (id: string) => {
     setIsUpdating(prev => ({ ...prev, [id]: true }));
     await new Promise(resolve => setTimeout(resolve, 300)); // Simulate API call
     removeItem(id);
