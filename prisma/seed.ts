@@ -80,8 +80,10 @@ async function main() {
   console.log('Seeding products...');
   
   for (const product of products) {
+    // Remove fields not in schema (e.g., rating) before insert
+    const { rating, ...data } = product as any;
     await prisma.product.create({
-      data: product,
+      data,
     });
   }
 

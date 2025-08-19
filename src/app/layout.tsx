@@ -6,6 +6,7 @@ import { CartProvider } from "@/contexts/CartContext";
 import { CheckoutProvider } from "@/contexts/CheckoutContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ToastContainer } from "@/components/Toast";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,15 +22,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={`${inter.className} bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100`}>
         <ThemeProvider>
           <CartProvider>
             <CheckoutProvider>
-              <ConditionalNavbar />
-              <main className="min-h-screen">
-                {children}
-              </main>
-              <ToastContainer />
+              <AuthProvider>
+                <ConditionalNavbar />
+                <main className="min-h-screen">
+                  {children}
+                </main>
+                <ToastContainer />
+              </AuthProvider>
             </CheckoutProvider>
           </CartProvider>
         </ThemeProvider>
