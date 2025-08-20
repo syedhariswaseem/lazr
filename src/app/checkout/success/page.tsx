@@ -56,21 +56,7 @@ export default function CheckoutSuccessPage() {
       
       console.log('Created order details from context:', orderDetails);
 
-      // Create order in backend
-      (async () => {
-        try {
-          const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
-          await fetch('/api/orders', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              items: cartItems.map((i: any) => ({ productId: i.id, quantity: i.quantity })),
-            }),
-          });
-        } catch (e) {
-          console.error('Failed to persist order', e);
-        }
-      })();
+      // Order has already been created server-side immediately after payment success
 
       setOrderDetails(orderDetails);
       clearCart();
@@ -79,15 +65,20 @@ export default function CheckoutSuccessPage() {
 
     // Fallback: Create order details from cart data
     console.log('⚠️ No checkout context data, using cart fallback');
-    const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
-    const total = cartItems.reduce((sum: number, item: { price: number; quantity: number }) => sum + (item.price * item.quantity), 0);
-    
+    interface CartItem {
+      name: string;
+      quantity: number;
+      price: number;
+    }
+    const cartItems: CartItem[] = JSON.parse(localStorage.getItem('cart') || '[]');
+    const total = cartItems.reduce((sum: number, item: CartItem) => sum + (item.price * item.quantity), 0);
+
     const fallbackOrderDetails: OrderDetails = {
       orderId: `ORD-${Date.now().toString().slice(-8).toUpperCase()}`,
       customerName: 'Customer',
       email: 'customer@example.com',
       total,
-      items: cartItems.map((item: { name: string; quantity: number; price: number }) => ({
+      items: cartItems.map((item: CartItem) => ({
         name: item.name,
         quantity: item.quantity,
         price: item.price
