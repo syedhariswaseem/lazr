@@ -71,7 +71,7 @@ function PaymentForm({
   calculateTotal: () => number;
   validateForm: () => boolean;
   scrollToField: (fieldName: string) => void;
-  setCheckoutData: (customerInfo: CustomerInfo, orderTotal: number, orderItems: Array<{ name: string; quantity: number; price: number }>) => void;
+  setCheckoutData: (customerInfo: CustomerInfo, orderTotal: number, orderItems: Array<{ productId: string; name: string; quantity: number; price: number }>) => void;
   setOrderId: (orderId: string) => void;
   cartItems: Array<{ id: string; name: string; quantity: number; price: number; imageUrl: string }>;
 }) {
