@@ -27,10 +27,10 @@ type CartAction =
 interface CartContextType {
   state: CartState;
   addItem: (item: Omit<CartItem, 'quantity'>) => void;
-  removeItem: (id: number) => void;
-  updateQuantity: (id: number, quantity: number) => void;
+  removeItem: (id: string) => void;
+  updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
-  getItemQuantity: (id: number) => number;
+  getItemQuantity: (id: string) => number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
