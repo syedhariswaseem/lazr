@@ -17,6 +17,8 @@ type Product = {
   rating: number;
   inStock: boolean;
   stockCount: number;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export default function ProductsPage() {

@@ -15,6 +15,15 @@ type Product = {
   rating: number;
   inStock: boolean;
   stockCount: number;
+  createdAt: string;
+  updatedAt: string;
+  // Optional fields for UI compatibility
+  reviewCount?: number;
+  longDescription?: string;
+  specifications?: Record<string, string>;
+  features?: string[];
+  warranty?: string;
+  delivery?: string;
 };
 
 export default function ProductDetailPage() {
@@ -126,7 +135,7 @@ export default function ProductDetailPage() {
                         <Star key={i} className={`h-5 w-5 ${i < Math.floor(product.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300 dark:text-gray-600'}`} />
                       ))}
                     </div>
-                    <span className="text-gray-700 dark:text-gray-400">({product.reviewCount} reviews)</span>
+                    <span className="text-gray-700 dark:text-gray-400">({product.reviewCount || 0} reviews)</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <button className="p-2 text-gray-400 hover:text-red-600 transition-colors">
@@ -139,7 +148,7 @@ export default function ProductDetailPage() {
                 </div>
 
                 <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">{product.name}</h2>
-                <p className="text-gray-700 dark:text-gray-300 mb-6">{product.longDescription}</p>
+                <p className="text-gray-700 dark:text-gray-300 mb-6">{product.longDescription || product.description}</p>
 
                 <div className="text-4xl font-bold text-gradient mb-6">
                   ${product.price.toLocaleString()}
@@ -205,17 +214,19 @@ export default function ProductDetailPage() {
               </div>
 
               {/* Features */}
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Key Features</h3>
-                <div className="grid md:grid-cols-2 gap-4">
-                  {product.features.map((feature: string, index: number) => (
-                    <div key={index} className="flex items-start space-x-3">
-                      <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span className="text-gray-700 dark:text-gray-300">{feature}</span>
-                    </div>
-                  ))}
+              {product.features && product.features.length > 0 && (
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Key Features</h3>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {product.features.map((feature: string, index: number) => (
+                      <div key={index} className="flex items-start space-x-3">
+                        <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+                        <span className="text-gray-700 dark:text-gray-300">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Warranty & Delivery */}
               <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
@@ -223,11 +234,11 @@ export default function ProductDetailPage() {
                 <div className="space-y-4">
                   <div className="flex items-center space-x-3">
                     <Shield className="h-5 w-5 text-blue-600" />
-                    <span className="text-gray-700 dark:text-gray-300">{product.warranty}</span>
+                    <span className="text-gray-700 dark:text-gray-300">{product.warranty || '1 year comprehensive warranty'}</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <Truck className="h-5 w-5 text-green-600" />
-                    <span className="text-gray-700 dark:text-gray-300">{product.delivery}</span>
+                    <span className="text-gray-700 dark:text-gray-300">{product.delivery || 'Free installation and training included'}</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <Clock className="h-5 w-5 text-purple-600" />
@@ -239,19 +250,21 @@ export default function ProductDetailPage() {
           </div>
 
           {/* Specifications */}
-          <div className="mt-16">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">Technical Specifications</h3>
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {Object.entries(product.specifications).map(([key, value]) => (
-                  <div key={key} className="border-b border-gray-200 dark:border-gray-700 pb-4">
-                    <dt className="text-sm font-medium text-gray-600 dark:text-gray-400">{key}</dt>
-                    <dd className="text-lg font-semibold text-gray-900 dark:text-white mt-1">{value as string}</dd>
-                  </div>
-                ))}
+          {product.specifications && Object.keys(product.specifications).length > 0 && (
+            <div className="mt-16">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">Technical Specifications</h3>
+                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {Object.entries(product.specifications).map(([key, value]) => (
+                    <div key={key} className="border-b border-gray-200 dark:border-gray-700 pb-4">
+                      <dt className="text-sm font-medium text-gray-600 dark:text-gray-400">{key}</dt>
+                      <dd className="text-lg font-semibold text-gray-900 dark:text-white mt-1">{value as string}</dd>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Related Products */}
           <div className="mt-16">
