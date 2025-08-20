@@ -31,6 +31,7 @@ export default function ProductDetailPage() {
   const router = useRouter();
   const { addItem, getItemQuantity } = useCart();
   const [product, setProduct] = useState<Product | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -39,10 +40,19 @@ export default function ProductDetailPage() {
     const productId = params.id as string;
     const load = async () => {
       try {
+        // Fetch current product
         const res = await fetch(`/api/products/${productId}`, { cache: 'no-store' });
         if (!res.ok) return setProduct(null);
         const data = await res.json();
         setProduct(data);
+
+        // Fetch related products (all products except current one)
+        const allRes = await fetch('/api/products', { cache: 'no-store' });
+        if (allRes.ok) {
+          const allProducts = await allRes.json();
+          const related = allProducts.filter((p: Product) => p.id !== productId).slice(0, 3);
+          setRelatedProducts(related);
+        }
       } catch {
         setProduct(null);
       }
@@ -267,13 +277,11 @@ export default function ProductDetailPage() {
           )}
 
           {/* Related Products */}
-          <div className="mt-16">
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">Related Products</h3>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {products
-                .filter(p => p.id !== product.id)
-                .slice(0, 3)
-                .map((relatedProduct) => (
+          {relatedProducts.length > 0 && (
+            <div className="mt-16">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">Related Products</h3>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {relatedProducts.map((relatedProduct) => (
                   <div
                     key={relatedProduct.id}
                     className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow cursor-pointer"
@@ -301,8 +309,9 @@ export default function ProductDetailPage() {
                     </div>
                   </div>
                 ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </section>
     </div>
