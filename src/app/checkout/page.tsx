@@ -498,6 +498,7 @@ export default function CheckoutPage() {
     
     // Store checkout data in Redux context
     setCheckoutData(customerInfo, calculateTotal(), cartItems.map(item => ({
+      productId: item.id,
       name: item.name,
       quantity: item.quantity,
       price: item.price
