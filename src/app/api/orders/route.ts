@@ -74,8 +74,8 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ order: result }, { status: 201 });
-  } catch (err: any) {
-    if (typeof err?.message === 'string' && err.message.startsWith('OUT_OF_STOCK:')) {
+  } catch (err: unknown) {
+    if (err instanceof Error && err.message.startsWith('OUT_OF_STOCK:')) {
       const productId = err.message.split(':')[1];
       return NextResponse.json({ error: 'Insufficient stock', productId }, { status: 409 });
     }
